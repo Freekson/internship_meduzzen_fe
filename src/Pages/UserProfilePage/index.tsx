@@ -1,19 +1,19 @@
 import { Helmet } from "react-helmet-async";
 import Layout from "../../Components/Layout";
-import styles from "./StartPage.module.scss";
+import styles from "./UserProfilePage.module.scss";
 
-const StartPage: React.FC = () => {
+const UserProfilePage = () => {
   return (
     <Layout>
       <Helmet>
-        <title>Meduzzen</title>
+        <title>User Profile</title>
       </Helmet>
       <div className={styles.wrapper}>
         <h1>Hello there</h1>
-        <p>Welcome to our website</p>
+        <p>Welcome to User Profile Page</p>
       </div>
     </Layout>
   );
 };
 
-export default StartPage;
+export default UserProfilePage;
