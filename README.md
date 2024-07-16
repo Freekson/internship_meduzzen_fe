@@ -1,6 +1,36 @@
 # Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was created with [Create React App](https://github.com/facebook/create-react-app).
+
+## Running the application with Docker
+
+### Prerequisites
+
+- Docker must be installed on your machine.
+
+### Building the Docker Image
+
+To build the Docker image, run the following command in the root directory of your project:
+
+```sh
+docker build -t meduzzen .
+```
+
+### Running the Docker Container
+
+To run the Docker container, use the following command:
+
+```sh
+docker run -p 3000:3000 meduzzen
+```
+
+### Development with Docker Compose
+
+To make development easier, you can use Docker Compose to automatically rebuild and restart the container when changes are made. Use the following command to start the application in development mode:
+
+```sh
+docker-compose up
+```
 
 ## Available Scripts
 
