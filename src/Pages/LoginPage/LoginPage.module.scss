@@ -46,6 +46,10 @@
   cursor: pointer;
   transition: background-color 0.3s;
 
+  &:last-child {
+    margin-left: 1rem;
+  }
+
   &:hover {
     background-color: #0056b3;
   }

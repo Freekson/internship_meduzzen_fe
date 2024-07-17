@@ -1,5 +1,5 @@
 import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit";
-
+import userReducer from "./user/slice";
 import { useDispatch } from "react-redux";
 
 interface TestState {
@@ -25,6 +25,7 @@ export const { setTestString } = testSlice.actions;
 export const store = configureStore({
   reducer: {
     test: testSlice.reducer,
+    user: userReducer,
   },
 });
 

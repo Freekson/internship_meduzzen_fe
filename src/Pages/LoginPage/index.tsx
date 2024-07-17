@@ -3,8 +3,13 @@ import Layout from "../../Components/Layout";
 import styles from "./LoginPage.module.scss";
 import { useState } from "react";
 import { LoginFormData } from "./types";
+import api from "../../Api/api";
+import { useAuth0 } from "@auth0/auth0-react";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
@@ -15,7 +20,10 @@ const LoginPage = () => {
     password: "",
   });
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const { loginWithRedirect } = useAuth0();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     let valid = true;
@@ -24,19 +32,31 @@ const LoginPage = () => {
     if (!formData.email) {
       newErrors.email = "Email is required";
       valid = false;
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Invalid email format";
+      valid = false;
     }
 
-    if (formData.password.length < 6) {
-      newErrors.password = "Password in to short";
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+      valid = false;
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password is to short";
       valid = false;
     }
 
     if (valid) {
-      console.log("Form submitted:", formData);
-      setErrors({
-        email: "",
-        password: "",
-      });
+      try {
+        const response = await api.post("/auth/login", {
+          user_email: formData.email,
+          user_password: formData.password,
+        });
+
+        localStorage.setItem("BearerToken", response.data.result.access_token);
+        navigate("/profile");
+      } catch (error) {
+        console.error("Login error:", error);
+      }
     } else {
       setErrors(newErrors);
     }
@@ -67,7 +87,6 @@ const LoginPage = () => {
         <div className={styles.form__group}>
           <label htmlFor="password">Password</label>
           <input
-            required
             type="password"
             id="password"
             name="password"
@@ -80,6 +99,13 @@ const LoginPage = () => {
         </div>
         <button type="submit" className={styles.button}>
           Login
+        </button>
+        <button
+          type="button"
+          className={styles.button}
+          onClick={() => loginWithRedirect()}
+        >
+          Login with Auth0
         </button>
       </form>
     </Layout>
