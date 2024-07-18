@@ -2,9 +2,13 @@ import styles from "./Header.module.scss";
 import { Link } from "react-router-dom";
 import { RootState } from "../../Store/store";
 import { useSelector } from "react-redux";
-import { Status } from "../../Types/enums";
+import { ReduxStatus } from "../../Types/enums";
+import { useAuth0 } from "@auth0/auth0-react";
+import Button from "../Button";
 const Header: React.FC = () => {
   const { status, userData } = useSelector((state: RootState) => state.user);
+
+  const { user, isAuthenticated, logout } = useAuth0();
 
   return (
     <header className={styles.header}>
@@ -28,7 +32,12 @@ const Header: React.FC = () => {
         </ul>
       </nav>
       <div className={styles.header__buttons}>
-        {status === Status.SUCCESS && userData ? (
+        {isAuthenticated ? (
+          <>
+            <span>{user?.given_name}</span>
+            <Button type="button" text="Logout" onClick={() => logout()} />
+          </>
+        ) : status === ReduxStatus.SUCCESS && userData ? (
           `${userData.user_email} ${userData.user_firstname}`
         ) : (
           <>

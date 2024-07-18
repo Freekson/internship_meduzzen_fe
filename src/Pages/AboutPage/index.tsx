@@ -6,6 +6,7 @@ import styles from "./AboutPage.module.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, setTestString } from "../../Store/store";
 import api from "../../Api/api";
+import { toast } from "react-toastify";
 
 const AboutPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,8 +27,8 @@ const AboutPage: React.FC = () => {
       try {
         const res = await api.get("/");
         setRes(res.data.result);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      } catch (error: any) {
+        toast.error(`${error.response.data.detail}`);
       }
     };
 

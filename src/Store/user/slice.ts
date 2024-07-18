@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 import api from "../../Api/api";
-import { Status } from "../../Types/enums";
+import { ReduxStatus } from "../../Types/enums";
 import { TUser, UserResponse, userState } from "./types";
 
 const tokenLS = localStorage.getItem("BearerToken");
@@ -9,7 +9,7 @@ const tokenLS = localStorage.getItem("BearerToken");
 const initialState: userState = {
   token: tokenLS ?? "",
   userData: null,
-  status: Status.INIT,
+  status: ReduxStatus.INIT,
 };
 
 export const fetchUser = createAsyncThunk<TUser, { token: string }>(
@@ -29,15 +29,15 @@ const userSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchUser.pending, (state) => {
       state.userData = null;
-      state.status = Status.LOADING;
+      state.status = ReduxStatus.LOADING;
     });
     builder.addCase(fetchUser.fulfilled, (state, action) => {
       state.userData = action.payload;
-      state.status = Status.SUCCESS;
+      state.status = ReduxStatus.SUCCESS;
     });
     builder.addCase(fetchUser.rejected, (state) => {
       state.userData = null;
-      state.status = Status.ERROR;
+      state.status = ReduxStatus.ERROR;
     });
   },
 });

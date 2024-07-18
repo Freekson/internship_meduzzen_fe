@@ -5,7 +5,7 @@ import { ThreeDots } from "react-loader-spinner";
 import styles from "./ProtectedRoute.module.scss";
 import { RootState, useAppDispatch } from "../../Store/store";
 import { fetchUser } from "../../Store/user/slice";
-import { Status } from "../../Types/enums";
+import { ReduxStatus } from "../../Types/enums";
 
 type TProps = {
   children: JSX.Element;
@@ -17,7 +17,7 @@ const ProtectedRoute: React.FC<TProps> = ({ children }) => {
   const { status } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
-    if (token && status === Status.INIT) {
+    if (token && status === ReduxStatus.INIT) {
       dispatch(fetchUser({ token }));
     }
   }, [dispatch, status, token]);
@@ -38,7 +38,11 @@ const ProtectedRoute: React.FC<TProps> = ({ children }) => {
     );
   }
 
-  return token && status !== Status.ERROR ? children : <Navigate to="/login" />;
+  return token && status !== ReduxStatus.ERROR ? (
+    children
+  ) : (
+    <Navigate to="/login" />
+  );
 };
 
 export default ProtectedRoute;

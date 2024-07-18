@@ -2,6 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Auth0Provider } from "@auth0/auth0-react";
+import { toast } from "react-toastify";
 
 interface Auth0ProviderWithNavigateProps {
   children: React.ReactNode;
@@ -15,7 +16,7 @@ const Auth0ProviderWithNavigate: React.FC<Auth0ProviderWithNavigateProps> = ({
   const navigate = useNavigate();
 
   if (!domain || !clientId) {
-    console.error("Missing Auth0 domain or client ID");
+    toast.error("Missing Auth0 domain or client ID");
     return null;
   }
 

@@ -1,9 +1,9 @@
-import { Status } from "../../Types/enums";
+import { ReduxStatus } from "../../Types/enums";
 
 export interface userState {
   token: string;
   userData: TUser | null;
-  status: Status;
+  status: ReduxStatus;
 }
 
 export type TUser = {

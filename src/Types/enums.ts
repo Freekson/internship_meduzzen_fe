@@ -1,4 +1,4 @@
-export enum Status {
+export enum ReduxStatus {
   LOADING = "loading",
   ERROR = "error",
   SUCCESS = "success",

@@ -2,63 +2,47 @@ import { Helmet } from "react-helmet-async";
 import Layout from "../../Components/Layout";
 import styles from "./LoginPage.module.scss";
 import { useState } from "react";
-import { LoginFormData } from "./types";
-import api from "../../Api/api";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
+import { LoginFormData } from "../../Types/api";
+import { loginUser } from "../../Api/user";
+import { validateLoginFormData } from "../../Utils/formValidation";
+import { toast } from "react-toastify";
+import InputLabel from "../../Components/InputLabel";
+import Button from "../../Components/Button";
 
 const LoginPage = () => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  const [formData, setFormData] = useState<LoginFormData>({
+  const initialLoginFormData: LoginFormData = {
     email: "",
     password: "",
-  });
+  };
 
-  const [errors, setErrors] = useState<LoginFormData>({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState<LoginFormData>(initialLoginFormData);
+  const [errors, setErrors] = useState<LoginFormData>(initialLoginFormData);
 
   const { loginWithRedirect } = useAuth0();
   const navigate = useNavigate();
 
+  const handleLoginWithRedirect = () => {
+    loginWithRedirect();
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    let valid = true;
-    const newErrors = { email: "", password: "" };
+    const { errors, isValid } = validateLoginFormData(formData);
 
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-      valid = false;
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Invalid email format";
-      valid = false;
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-      valid = false;
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password is to short";
-      valid = false;
-    }
-
-    if (valid) {
+    if (isValid) {
+      setErrors(initialLoginFormData);
       try {
-        const response = await api.post("/auth/login", {
-          user_email: formData.email,
-          user_password: formData.password,
-        });
-
-        localStorage.setItem("BearerToken", response.data.result.access_token);
+        const response = await loginUser(formData);
+        localStorage.setItem("BearerToken", response.result.access_token);
         navigate("/profile");
-      } catch (error) {
-        console.error("Login error:", error);
+      } catch (error: any) {
+        toast.error(`${error.response.data.detail}`);
       }
     } else {
-      setErrors(newErrors);
+      setErrors(errors);
     }
   };
 
@@ -74,22 +58,22 @@ const LoginPage = () => {
       <form className={styles.form} onSubmit={handleSubmit}>
         <h2 className={styles.form__title}>Login</h2>
         <div className={styles.form__group}>
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
+          <InputLabel
+            label="Email"
             id="email"
             name="email"
+            type="email"
             value={formData.email}
             onChange={handleChange}
           />
           {errors.email && <div className={styles.error}>{errors.email}</div>}
         </div>
         <div className={styles.form__group}>
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
+          <InputLabel
+            label="Password"
             id="password"
             name="password"
+            type="password"
             value={formData.password}
             onChange={handleChange}
           />
@@ -97,16 +81,14 @@ const LoginPage = () => {
             <div className={styles.error}>{errors.password}</div>
           )}
         </div>
-        <button type="submit" className={styles.button}>
-          Login
-        </button>
-        <button
-          type="button"
-          className={styles.button}
-          onClick={() => loginWithRedirect()}
-        >
-          Login with Auth0
-        </button>
+        <div className={styles.btns}>
+          <Button type="submit" text="Login" />
+          <Button
+            type="button"
+            text="Login with Auth0"
+            onClick={handleLoginWithRedirect}
+          />
+        </div>
       </form>
     </Layout>
   );
