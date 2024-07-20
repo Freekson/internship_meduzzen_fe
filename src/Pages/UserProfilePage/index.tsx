@@ -210,7 +210,8 @@ const UserProfilePage = () => {
               name="user_email"
               value={formData.user_email}
               required
-              onChange={handleChange}
+              onChange={() => {}}
+              disabled={true}
             />
             <InputLabel
               label="First Name"
