@@ -8,11 +8,21 @@ interface InputLabelProps {
   type: string;
   required?: boolean;
   value: string;
+  disabled?: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const InputLabel: React.FC<InputLabelProps> = React.memo(
-  ({ label, id, name, type, required = false, value, onChange }) => {
+  ({
+    label,
+    id,
+    name,
+    type,
+    required = false,
+    value,
+    disabled = false,
+    onChange,
+  }) => {
     return (
       <>
         <label htmlFor={id}>{label}</label>
@@ -24,6 +34,7 @@ const InputLabel: React.FC<InputLabelProps> = React.memo(
           value={value}
           onChange={onChange}
           className={styles.input}
+          disabled={disabled}
         />
       </>
     );
