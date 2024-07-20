@@ -1,32 +1,21 @@
 import React from "react";
-import { useAppDispatch } from "../../Store/store";
-import { setActivePage } from "../../Store/user/slice";
 import styles from "./Pagination.module.scss";
 
 type TProps = {
   pageCount: number;
   activePage: number;
+  onPageChange: (pageNumber: number) => void;
+  onPrevious: () => void;
+  onNext: () => void;
 };
 
-const Pagination: React.FC<TProps> = ({ pageCount, activePage }) => {
-  const dispatch = useAppDispatch();
-
-  const handlePrevious = () => {
-    if (activePage > 1) {
-      dispatch(setActivePage(activePage - 1));
-    }
-  };
-
-  const handleNext = () => {
-    if (activePage < pageCount) {
-      dispatch(setActivePage(activePage + 1));
-    }
-  };
-
-  const handlePageClick = (pageNumber: number) => {
-    dispatch(setActivePage(pageNumber));
-  };
-
+const Pagination: React.FC<TProps> = ({
+  pageCount,
+  activePage,
+  onPageChange,
+  onPrevious,
+  onNext,
+}) => {
   const renderPages = () => {
     let pages = [];
 
@@ -63,7 +52,7 @@ const Pagination: React.FC<TProps> = ({ pageCount, activePage }) => {
         className={`${styles.pageItem} ${
           page === activePage ? styles.active : ""
         }`}
-        onClick={() => typeof page === "number" && handlePageClick(page)}
+        onClick={() => typeof page === "number" && onPageChange(page)}
       >
         {page}
       </span>
@@ -72,11 +61,11 @@ const Pagination: React.FC<TProps> = ({ pageCount, activePage }) => {
 
   return (
     <div className={styles.pagination}>
-      <span className={styles.pageItem} onClick={handlePrevious}>
+      <span className={styles.pageItem} onClick={onPrevious}>
         &lt;
       </span>
       {renderPages()}
-      <span className={styles.pageItem} onClick={handleNext}>
+      <span className={styles.pageItem} onClick={onNext}>
         &gt;
       </span>
     </div>

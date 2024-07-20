@@ -1,6 +1,10 @@
 // utils/formValidation.ts
 
-import { LoginFormData, RegisterFormData } from "../Types/api";
+import {
+  CreateCompanyFormData,
+  LoginFormData,
+  RegisterFormData,
+} from "../Types/api";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -82,4 +86,18 @@ export const validateLoginFormData = (
   }
 
   return { errors: errors, isValid };
+};
+
+export const validateCreateCompanyFormData = (
+  formData: CreateCompanyFormData
+) => {
+  let errors: Partial<CreateCompanyFormData> = {};
+  let isValid = true;
+
+  if (!formData.company_name) {
+    isValid = false;
+    errors.company_name = "Company name is required.";
+  }
+
+  return { errors, isValid };
 };

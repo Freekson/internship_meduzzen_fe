@@ -26,3 +26,8 @@ export interface ChangePasswordParams {
   user_password: string;
   user_password_repeat: string;
 }
+
+export interface CreateCompanyFormData {
+  company_name: string;
+  is_visible: boolean;
+}

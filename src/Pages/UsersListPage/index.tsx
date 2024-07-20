@@ -3,7 +3,7 @@ import Layout from "../../Components/Layout";
 import styles from "./UsersListPage.module.scss";
 import { RootState, useAppDispatch } from "../../Store/store";
 import { useEffect } from "react";
-import { fetchUsersList } from "../../Store/user/slice";
+import { fetchUsersList, setActivePage } from "../../Store/user/slice";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { ReduxStatus } from "../../Types/enums";
@@ -16,6 +16,24 @@ const UsersListPage = () => {
   );
 
   const page_size = 20;
+  const current_page = usersList?.pagination.current_page ?? 1;
+  const total_page = usersList?.pagination.total_page ?? 5;
+
+  const handlePageChange = (pageNumber: number) => {
+    dispatch(setActivePage(pageNumber));
+  };
+
+  const handlePrevious = () => {
+    if (current_page > 1) {
+      dispatch(setActivePage(current_page - 1));
+    }
+  };
+
+  const handleNext = () => {
+    if (current_page < total_page) {
+      dispatch(setActivePage(current_page + 1));
+    }
+  };
 
   useEffect(() => {
     if (token && listStatus === ReduxStatus.INIT) {
@@ -36,9 +54,7 @@ const UsersListPage = () => {
       </Helmet>
 
       <div className={styles.wrapper}>
-        <h1>Hello there</h1>
-        <p>Welcome to List of users page</p>
-
+        <h1>List of users</h1>
         <div className={styles.usersList}>
           {usersList?.users.map((user, index) => (
             <div key={index} className={styles.userCard}>
@@ -55,8 +71,11 @@ const UsersListPage = () => {
         </div>
 
         <Pagination
-          pageCount={usersList?.pagination.total_page ?? 5}
-          activePage={usersList?.pagination.current_page ?? 1}
+          pageCount={total_page}
+          activePage={current_page}
+          onPageChange={handlePageChange}
+          onPrevious={handlePrevious}
+          onNext={handleNext}
         />
       </div>
     </Layout>
