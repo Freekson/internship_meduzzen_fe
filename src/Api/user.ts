@@ -25,6 +25,7 @@ export const loginUser = (formData: LoginFormData): Promise<LoginResponse> => {
     })
     .then((response) => response.data);
 };
+
 export const updateUser = (
   userId: number,
   userData: Partial<TUser>,

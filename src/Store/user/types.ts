@@ -1,13 +1,16 @@
 import { ReduxStatus } from "../../Types/enums";
+import { TCompany, TPagination } from "../../Types/types";
 
 export interface userState {
   token: string;
   userData: TUser | null;
   usersList: UsersResult | null;
   fetchedById: TUser[];
+  companies: TCompany[];
   status: ReduxStatus;
   listStatus: ReduxStatus;
   fetchedByIdStatus: ReduxStatus;
+  companiesStatus: ReduxStatus;
 }
 
 export type TUser = {
@@ -37,12 +40,6 @@ export type TListUserItem = {
   user_avatar: string;
 };
 
-export type TPagination = {
-  current_page: number;
-  total_page: number;
-  total_results: number;
-};
-
 export type UsersResult = {
   users: TListUserItem[];
   pagination: TPagination;
@@ -52,4 +49,12 @@ export type UsersListResponse = {
   status_code: number;
   detail: string;
   result: UsersResult;
+};
+
+export type CompaniesResponse = {
+  status_code: number;
+  detail: string;
+  result: {
+    companies: TCompany[];
+  };
 };

@@ -17,6 +17,7 @@ import { ReduxStatus } from "./Types/enums";
 import { fetchUser } from "./Store/user/slice";
 import "react-toastify/dist/ReactToastify.css";
 import UserPage from "./Pages/UserPage";
+import CompanyPage from "./Pages/CompanyPage";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -81,7 +82,7 @@ function App() {
           }
         ></Route>
         <Route
-          path="/companies-list"
+          path="/companies"
           element={
             <ProtectedRoute>
               <CompaniesListPage />
@@ -93,6 +94,14 @@ function App() {
           element={
             <ProtectedRoute>
               <UserPage />
+            </ProtectedRoute>
+          }
+        ></Route>
+        <Route
+          path="/companies/:id"
+          element={
+            <ProtectedRoute>
+              <CompanyPage />
             </ProtectedRoute>
           }
         ></Route>

@@ -3,12 +3,14 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../Api/api";
 import { ReduxStatus } from "../../Types/enums";
 import {
+  CompaniesResponse,
   TUser,
   UserResponse,
   UsersListResponse,
   UsersResult,
   userState,
 } from "./types";
+import { TCompany } from "../../Types/types";
 
 const tokenLS = localStorage.getItem("BearerToken");
 
@@ -17,9 +19,11 @@ const initialState: userState = {
   userData: null,
   usersList: null,
   fetchedById: [],
+  companies: [],
   status: ReduxStatus.INIT,
   listStatus: ReduxStatus.INIT,
   fetchedByIdStatus: ReduxStatus.INIT,
+  companiesStatus: ReduxStatus.INIT,
 };
 
 export const fetchUser = createAsyncThunk<TUser, { token: string }>(
@@ -51,6 +55,19 @@ export const fetchUserById = createAsyncThunk<
     headers: { Authorization: `Bearer ${token}` },
   });
   return data.result;
+});
+
+export const fetchCompanies = createAsyncThunk<
+  TCompany[],
+  { token: string; user_id: number }
+>("user/fetchCompanies", async ({ token, user_id }) => {
+  const { data } = await api.get<CompaniesResponse>(
+    `/user/${user_id}/companies_list/`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return data.result.companies;
 });
 
 const userSlice = createSlice({
@@ -118,6 +135,19 @@ const userSlice = createSlice({
     });
     builder.addCase(fetchUserById.rejected, (state) => {
       state.fetchedByIdStatus = ReduxStatus.ERROR;
+    });
+
+    builder.addCase(fetchCompanies.pending, (state) => {
+      state.companies = [];
+      state.companiesStatus = ReduxStatus.LOADING;
+    });
+    builder.addCase(fetchCompanies.fulfilled, (state, action) => {
+      state.companies = action.payload;
+      state.companiesStatus = ReduxStatus.SUCCESS;
+    });
+    builder.addCase(fetchCompanies.rejected, (state) => {
+      state.companies = [];
+      state.companiesStatus = ReduxStatus.ERROR;
     });
   },
 });
