@@ -31,3 +31,13 @@ export interface CreateCompanyFormData {
   company_name: string;
   is_visible: boolean;
 }
+
+export interface UserResponse {
+  user_id: number;
+  user_email: string;
+  user_firstname: string;
+  user_lastname: string;
+  user_avatar: string;
+  action_id: number;
+  action: string;
+}

@@ -13,15 +13,21 @@ import { validateCreateCompanyFormData } from "../../Utils/formValidation";
 import Modal from "../../Components/Modal";
 import { createCompany } from "../../Api/company";
 import { Link } from "react-router-dom";
+import { leaveCompany } from "../../Api/actions";
+import ConfirmModal from "../../Components/ConfirmModal";
+import { TCompany } from "../../Types/types";
 
 const CompanyProfilePage: React.FC = () => {
-  const token = localStorage.getItem("BearerToken");
   const dispatch = useAppDispatch();
-  const { userData: user, companies } = useSelector(
-    (state: RootState) => state.user
-  );
+  const {
+    userData: user,
+    companies,
+    token,
+  } = useSelector((state: RootState) => state.user);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState<TCompany | null>(null);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
@@ -33,6 +39,11 @@ const CompanyProfilePage: React.FC = () => {
     initialCompanyFormData
   );
   const [errors, setErrors] = useState<Partial<CreateCompanyFormData>>({});
+
+  const openConfirmModal = (company: TCompany) => {
+    setSelectedCompany(company);
+    setIsConfirmOpen(true);
+  };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -50,20 +61,36 @@ const CompanyProfilePage: React.FC = () => {
 
     const { errors, isValid } = validateCreateCompanyFormData(formData);
 
-    if (isValid) {
-      setErrors({});
-      try {
-        await createCompany(formData, token ?? "");
-        setIsModalOpen(false);
-        toast.success("Company created");
-        dispatch(
-          fetchCompanies({ token: token ?? "", user_id: user?.user_id ?? 0 })
-        );
-      } catch (error: any) {
-        toast.error(`${error.response.data.detail}`);
-      }
+    if (companies.length >= 5) {
+      toast.warning("You have too many companies");
     } else {
-      setErrors(errors);
+      if (isValid) {
+        setErrors({});
+        try {
+          await createCompany(formData);
+          setIsModalOpen(false);
+          toast.success("Company created");
+          dispatch(
+            fetchCompanies({ token: token ?? "", user_id: user?.user_id ?? 0 })
+          );
+        } catch (error: any) {
+          toast.error(`${error.response.data.detail}`);
+        }
+      } else {
+        setErrors(errors);
+      }
+    }
+  };
+
+  const handleLeave = async (company_name: string, action_id: number) => {
+    try {
+      await leaveCompany(action_id);
+      dispatch(
+        fetchCompanies({ token: token ?? "", user_id: user?.user_id ?? 0 })
+      );
+      toast.success(`You leave company: ${company_name}`);
+    } catch (error) {
+      toast.error(`Failed to leave company: ${company_name}`);
     }
   };
 
@@ -113,6 +140,14 @@ const CompanyProfilePage: React.FC = () => {
                 >
                   Show
                 </Link>
+                {item.action !== "owner" && (
+                  <Button
+                    text="Leave company"
+                    type="button"
+                    variant="danger"
+                    onClick={() => openConfirmModal(item)}
+                  />
+                )}
               </div>
             </div>
           ))
@@ -159,6 +194,21 @@ const CompanyProfilePage: React.FC = () => {
             </div>
           </form>
         </Modal>
+        {selectedCompany && (
+          <ConfirmModal
+            isOpen={isConfirmOpen}
+            onClose={() => setIsConfirmOpen(false)}
+            onConfirm={() => {
+              handleLeave(
+                selectedCompany.company_name,
+                selectedCompany.action_id
+              );
+              setIsConfirmOpen(false);
+            }}
+            text={`Are you sure you want to leave ${selectedCompany.company_name}? This action is irreversible`}
+            btnText="Yes, Leave"
+          />
+        )}
       </div>
     </Layout>
   );

@@ -11,13 +11,21 @@ import { useSelector } from "react-redux";
 import { ReduxStatus } from "../../Types/enums";
 import Pagination from "../../Components/Pagination";
 import { Link } from "react-router-dom";
+import Button from "../../Components/Button";
+import { fetchCompanies } from "../../Store/user/slice";
+import { requestJoin } from "../../Api/actions";
+import { toast } from "react-toastify";
 
 const CompaniesListPage = () => {
   const dispatch = useAppDispatch();
   const { companies, pagination, companiesStatus } = useSelector(
     (state: RootState) => state.company
   );
-  const token = localStorage.getItem("BearerToken");
+  const {
+    userData: user,
+    companies: userCompanies,
+    token,
+  } = useSelector((state: RootState) => state.user);
   const page_size = 20;
   const current_page = pagination?.current_page ?? 1;
   const total_page = pagination?.total_page ?? 5;
@@ -38,6 +46,23 @@ const CompaniesListPage = () => {
     }
   };
 
+  const handleRequestJoin = async (company_id: number) => {
+    try {
+      const response = await requestJoin(company_id);
+      if (response.status === 200) {
+        toast.success("Request to join sent successfully");
+      } else {
+        toast.error("Failed to send request to join");
+      }
+    } catch (error: any) {
+      if (error.response.data.detail === "you cannot send this request 1") {
+        toast.warning("You have already sent an invite to this company");
+      } else {
+        toast.error("Error sending request to join");
+      }
+    }
+  };
+
   useEffect(() => {
     if (companiesStatus === ReduxStatus.INIT) {
       dispatch(
@@ -49,6 +74,15 @@ const CompaniesListPage = () => {
       );
     }
   }, [companiesStatus, dispatch, pagination, token]);
+
+  useEffect(() => {
+    if (token) {
+      dispatch(
+        fetchCompanies({ token: token ?? "", user_id: user?.user_id ?? 0 })
+      );
+    }
+  }, [dispatch, token, user]);
+
   return (
     <Layout>
       <Helmet>
@@ -82,12 +116,24 @@ const CompaniesListPage = () => {
                   <p className={styles.visibility}>
                     {company.is_visible ? "Visible" : "Hidden"}
                   </p>
-                  <Link
-                    to={`/companies/${company.company_id}`}
-                    className={styles.showLink}
-                  >
-                    Show
-                  </Link>
+                  <div className={styles.actions}>
+                    <Link
+                      to={`/companies/${company.company_id}`}
+                      className={styles.showLink}
+                    >
+                      Show
+                    </Link>
+                    {!userCompanies.some(
+                      (userCompany) =>
+                        userCompany.company_id === company.company_id
+                    ) && (
+                      <Button
+                        text="Request to join"
+                        type="button"
+                        onClick={() => handleRequestJoin(company.company_id)}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             ))

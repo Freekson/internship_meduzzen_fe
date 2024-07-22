@@ -83,6 +83,9 @@ const userSlice = createSlice({
         state.listStatus = ReduxStatus.INIT;
       }
     },
+    setToken(state, action) {
+      state.token = action.payload;
+    },
     resetState(state) {
       state.token = "";
       state.userData = initialState.userData;
@@ -152,5 +155,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setActivePage, resetState } = userSlice.actions;
+export const { setActivePage, resetState, setToken } = userSlice.actions;
 export default userSlice.reducer;

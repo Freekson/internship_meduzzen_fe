@@ -1,5 +1,5 @@
 import StartPage from "./Pages/StartPage";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import AboutPage from "./Pages/AboutPage";
 import "./App.scss";
 import CompanyProfilePage from "./Pages/CompanyProfilePage";
@@ -18,17 +18,27 @@ import { fetchUser } from "./Store/user/slice";
 import "react-toastify/dist/ReactToastify.css";
 import UserPage from "./Pages/UserPage";
 import CompanyPage from "./Pages/CompanyPage";
+import { handleLogout } from "./Utils/handleLogout";
+import { toast } from "react-toastify";
+import UserInvitationPage from "./Pages/UserInvitationPage";
+import UserRequestPage from "./Pages/UserRequestPage";
+import CompanyRequestPage from "./Pages/CompanyRequestPage";
+import CompanyInvitationPage from "./Pages/CompanyInvitationPage";
 
 function App() {
   const dispatch = useAppDispatch();
-  const token = localStorage.getItem("BearerToken");
-  const { status } = useSelector((state: RootState) => state.user);
+  const navigate = useNavigate();
+  const { status, token } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     if (token && status === ReduxStatus.INIT) {
       dispatch(fetchUser({ token }));
     }
-  }, [dispatch, status, token]);
+    if (status === ReduxStatus.ERROR) {
+      handleLogout(dispatch, navigate);
+      toast.warning("Your token has expired");
+    }
+  }, [dispatch, navigate, status, token]);
 
   return (
     <div className="App">
@@ -86,6 +96,38 @@ function App() {
           element={
             <ProtectedRoute>
               <CompaniesListPage />
+            </ProtectedRoute>
+          }
+        ></Route>
+        <Route
+          path="/user/invites"
+          element={
+            <ProtectedRoute>
+              <UserInvitationPage />
+            </ProtectedRoute>
+          }
+        ></Route>
+        <Route
+          path="/user/requests"
+          element={
+            <ProtectedRoute>
+              <UserRequestPage />
+            </ProtectedRoute>
+          }
+        ></Route>
+        <Route
+          path="/company/:id/requests"
+          element={
+            <ProtectedRoute>
+              <CompanyRequestPage />
+            </ProtectedRoute>
+          }
+        ></Route>
+        <Route
+          path="/company/:id/invites"
+          element={
+            <ProtectedRoute>
+              <CompanyInvitationPage />
             </ProtectedRoute>
           }
         ></Route>

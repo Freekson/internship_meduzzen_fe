@@ -80,7 +80,7 @@
   .showLink {
     display: inline-block;
     margin-top: 0.5rem;
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1.5rem;
     color: #007bff;
     text-decoration: none;
     border: 1px solid #007bff;
@@ -92,5 +92,14 @@
       background: #007bff;
       color: #fff;
     }
+  }
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+
+  a {
+    margin-bottom: 1rem;
   }
 }

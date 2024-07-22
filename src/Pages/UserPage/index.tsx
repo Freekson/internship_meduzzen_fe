@@ -12,12 +12,11 @@ import { ThreeDots } from "react-loader-spinner";
 const UserPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
-  const { fetchedById, fetchedByIdStatus } = useSelector(
+  const { fetchedById, fetchedByIdStatus, token } = useSelector(
     (state: RootState) => state.user
   );
 
   const user = fetchedById.find((user) => user.user_id === Number(id));
-  const token = localStorage.getItem("BearerToken");
 
   useEffect(() => {
     if (token && id) {

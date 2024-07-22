@@ -29,7 +29,7 @@
   display: flex;
   justify-content: center;
   height: 50px;
-  margin-top: 2rem;
+  margin: 2rem 0;
 
   a {
     margin-left: 2rem;
@@ -80,7 +80,10 @@
   background-color: #fff;
 
   .company_btns {
-    button:not(:last-child) {
+    display: flex;
+
+    button,
+    a:not(:last-child) {
       margin-right: 1rem;
     }
   }

@@ -12,9 +12,8 @@ type TProps = {
 };
 
 const ProtectedRoute: React.FC<TProps> = ({ children }) => {
-  const token = localStorage.getItem("BearerToken");
   const dispatch = useAppDispatch();
-  const { status } = useSelector((state: RootState) => state.user);
+  const { status, token } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     if (token && status === ReduxStatus.INIT) {

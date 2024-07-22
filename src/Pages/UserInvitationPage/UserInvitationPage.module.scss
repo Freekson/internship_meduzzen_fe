@@ -1,0 +1,66 @@
+.wrapper {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 24px;
+  color: #333;
+  text-align: center;
+}
+
+.companyList {
+  margin-top: 20px;
+}
+
+.companyItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  .btns {
+    button:not(:last-child) {
+      margin-right: 1rem;
+    }
+
+    .showLink {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      color: #007bff;
+      text-decoration: none;
+      border: 1px solid #007bff;
+      border-radius: 4px;
+      background: #fff;
+      transition: background 0.3s, color 0.3s;
+
+      &:hover {
+        background: #007bff;
+        color: #fff;
+      }
+    }
+  }
+
+  p {
+    margin: 0;
+    font-size: 18px;
+    color: #555;
+  }
+}
+
+.noCompanies {
+  text-align: center;
+  color: #777;
+  font-size: 16px;
+  margin-top: 20px;
+}

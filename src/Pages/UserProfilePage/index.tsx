@@ -20,11 +20,11 @@ import { handleLogout } from "../../Utils/handleLogout";
 import ConfirmModal from "../../Components/ConfirmModal";
 
 const UserProfilePage = () => {
-  const token = localStorage.getItem("BearerToken");
-
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { userData: user } = useSelector((state: RootState) => state.user);
+  const { userData: user, token } = useSelector(
+    (state: RootState) => state.user
+  );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
@@ -91,7 +91,7 @@ const UserProfilePage = () => {
     };
 
     try {
-      await updateUser(user?.user_id ?? 0, updatedFormData, token ?? "");
+      await updateUser(user?.user_id ?? 0, updatedFormData);
       await dispatch(fetchUser({ token: token ?? "" }));
 
       toast.success("User updated successfully");
@@ -114,7 +114,7 @@ const UserProfilePage = () => {
     }
 
     try {
-      await updatePassword(user?.user_id ?? 0, passwordData, token ?? "");
+      await updatePassword(user?.user_id ?? 0, passwordData);
       setIsPasswordOpen(false);
       toast.success("Password updated successfully");
     } catch (error) {
@@ -134,7 +134,7 @@ const UserProfilePage = () => {
     avatarData.append("file", file);
 
     try {
-      await updateAvatar(user?.user_id ?? 0, avatarData, token ?? "");
+      await updateAvatar(user?.user_id ?? 0, avatarData);
       await dispatch(fetchUser({ token: token ?? "" }));
       toast.success("Avatar updated successfully");
     } catch (error) {
@@ -144,7 +144,7 @@ const UserProfilePage = () => {
 
   const handleDelete = async () => {
     try {
-      await deleteUser(user?.user_id ?? 0, token ?? "");
+      await deleteUser(user?.user_id ?? 0);
       toast.success("User deleted successfully");
       handleLogout(dispatch, navigate);
     } catch (error) {
@@ -309,9 +309,17 @@ const UserProfilePage = () => {
           <Button type="submit" text="Upload Avatar" variant="warning" />
         </form>
 
-        <Link to="/users-list" className={styles.see_all}>
-          See all users
-        </Link>
+        <div className={styles.links}>
+          <Link to="/users-list" className={styles.see_all}>
+            See all users
+          </Link>
+          <Link to="/user/invites" className={styles.see_all}>
+            See my invitations
+          </Link>
+          <Link to="/user/requests" className={styles.see_all}>
+            See my requests
+          </Link>
+        </div>
       </div>
     </Layout>
   );
