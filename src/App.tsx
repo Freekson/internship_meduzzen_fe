@@ -20,8 +20,7 @@ import UserPage from "./Pages/UserPage";
 
 function App() {
   const dispatch = useAppDispatch();
-  const token = localStorage.getItem("BearerToken");
-  const { status } = useSelector((state: RootState) => state.user);
+  const { status, token } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     if (token && status === ReduxStatus.INIT) {

@@ -19,11 +19,11 @@ import { fetchUser } from "../../Store/user/slice";
 import { handleLogout } from "../../Utils/handleLogout";
 
 const UserProfilePage = () => {
-  const token = localStorage.getItem("BearerToken");
-
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { userData: user } = useSelector((state: RootState) => state.user);
+  const { userData: user, token } = useSelector(
+    (state: RootState) => state.user
+  );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
@@ -90,7 +90,7 @@ const UserProfilePage = () => {
     };
 
     try {
-      await updateUser(user?.user_id ?? 0, updatedFormData, token ?? "");
+      await updateUser(user?.user_id ?? 0, updatedFormData);
       await dispatch(fetchUser({ token: token ?? "" }));
 
       toast.success("User updated successfully");
@@ -113,7 +113,7 @@ const UserProfilePage = () => {
     }
 
     try {
-      await updatePassword(user?.user_id ?? 0, passwordData, token ?? "");
+      await updatePassword(user?.user_id ?? 0, passwordData);
       toast.success("Password updated successfully");
     } catch (error) {
       toast.error("Failed to update password.");
@@ -132,7 +132,7 @@ const UserProfilePage = () => {
     avatarData.append("file", file);
 
     try {
-      await updateAvatar(user?.user_id ?? 0, avatarData, token ?? "");
+      await updateAvatar(user?.user_id ?? 0, avatarData);
       await dispatch(fetchUser({ token: token ?? "" }));
       toast.success("Avatar updated successfully");
     } catch (error) {
@@ -142,7 +142,7 @@ const UserProfilePage = () => {
 
   const handleDelete = async () => {
     try {
-      await deleteUser(user?.user_id ?? 0, token ?? "");
+      await deleteUser(user?.user_id ?? 0);
       toast.success("User deleted successfully");
       handleLogout(dispatch, navigate);
     } catch (error) {

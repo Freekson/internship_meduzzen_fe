@@ -11,11 +11,10 @@ import Pagination from "../../Components/Pagination";
 
 const UsersListPage = () => {
   const dispatch = useAppDispatch();
-  const { listStatus, usersList } = useSelector(
+  const { listStatus, usersList, token } = useSelector(
     (state: RootState) => state.user
   );
 
-  const token = localStorage.getItem("BearerToken");
   const page_size = 20;
 
   useEffect(() => {

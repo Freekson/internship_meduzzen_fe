@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import styles from "./AboutPage.module.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, setTestString } from "../../Store/store";
-import api from "../../Api/api";
+import { apiWithoutAuth } from "../../Api/api";
 import { toast } from "react-toastify";
 
 const AboutPage: React.FC = () => {
@@ -25,7 +25,7 @@ const AboutPage: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await api.get("/");
+        const res = await apiWithoutAuth.get("/");
         setRes(res.data.result);
       } catch (error: any) {
         toast.error(`${error.response.data.detail}`);
