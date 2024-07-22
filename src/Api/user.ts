@@ -52,6 +52,14 @@ export const deleteUser = (userId: number) => {
   return api.delete(`/user/${userId}/`);
 };
 
+export const getUserInvitation = (userId: number) => {
+  return api.get(`/user/${userId}/invites_list/`);
+};
+
+export const getUserRequests = (userId: number) => {
+  return api.get(`/user/${userId}/requests_list/`);
+};
+
 export const fetchUserFromApi = async (): Promise<TUser> => {
   const { data } = await api.get<UserResponse>(`/auth/me/`);
   return data.result;

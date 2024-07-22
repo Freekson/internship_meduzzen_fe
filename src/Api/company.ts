@@ -44,6 +44,17 @@ export const fetchAllCompaniesFromApi = async (
   return data.result;
 };
 
+export const getCompanyRequests = (companyId: number) => {
+  return api.get(`/company/${companyId}/requests_list/`);
+};
+
+export const getCompanyInvitation = (companyId: number) => {
+  return api.get(`/company/${companyId}/invites_list/`);
+};
+
+export const getCompanyMembers = (companyId: number) => {
+  return api.get(`/company/${companyId}/members_list/`);
+};
 export const fetchCompanyByIdFromApi = async (
   company_id: number
 ): Promise<CompanyDetails> => {

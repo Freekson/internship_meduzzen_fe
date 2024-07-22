@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import Layout from "../../Components/Layout";
 import styles from "./CompanyPage.module.scss";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { RootState, useAppDispatch } from "../../Store/store";
 import { useSelector } from "react-redux";
 import { FormEvent, useEffect, useState } from "react";
@@ -14,10 +14,13 @@ import Modal from "../../Components/Modal";
 import InputLabel from "../../Components/InputLabel";
 import {
   deleteCompany,
+  getCompanyMembers,
   updateCompany,
   updateVisibility,
 } from "../../Api/company";
 import { toast } from "react-toastify";
+import { UserResponse } from "../../Types/api";
+import { leaveCompany } from "../../Api/actions";
 
 const CompanyPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -33,6 +36,14 @@ const CompanyPage = () => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [members, setMembers] = useState<UserResponse[]>([]);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
+
+  const openConfirmModal = (user: UserResponse) => {
+    setSelectedUser(user);
+    setIsDeleteOpen(true);
+  };
 
   const company =
     fetchedById.find((company) => company.company_id === Number(id)) || null;
@@ -59,6 +70,21 @@ const CompanyPage = () => {
       );
     }
   }, [dispatch, id, token]);
+
+  useEffect(() => {
+    const fetchCompanyMembers = async () => {
+      if (!id) return;
+
+      try {
+        const response = await getCompanyMembers(parseInt(id));
+        setMembers(response.data.result.users);
+      } catch (error: any) {
+        toast.dismiss();
+      }
+    };
+
+    fetchCompanyMembers();
+  }, [id, token]);
 
   useEffect(() => {
     setIsVisible(company?.is_visible ?? false);
@@ -136,6 +162,23 @@ const CompanyPage = () => {
       toast.success("Company updated successfully");
     } catch (error) {
       toast.error("Failed to update company.");
+    }
+  };
+
+  const handleLeave = async (user_name: string, action_id: number) => {
+    try {
+      await leaveCompany(action_id);
+      if (!id) return;
+
+      try {
+        const response = await getCompanyMembers(parseInt(id));
+        setMembers(response.data.result.users);
+      } catch (error) {
+        toast.error("Error while fetching company members");
+      }
+      toast.success(`Member ${user_name} has been deleted`);
+    } catch (error) {
+      toast.error(`Failed to delete member: ${user_name}`);
     }
   };
 
@@ -239,6 +282,53 @@ const CompanyPage = () => {
                 />
               </div>
             )}
+            {user?.user_id === company.company_owner.user_id && (
+              <div className={styles.actions}>
+                <Link
+                  to={`/company/${company.company_id}/requests`}
+                  className={styles.showLink}
+                >
+                  See company requests
+                </Link>
+                <Link
+                  to={`/company/${company.company_id}/invites`}
+                  className={styles.showLink}
+                >
+                  See company invites
+                </Link>
+              </div>
+            )}
+            {members.length > 0 && (
+              <h1 className={styles.header}>Company members</h1>
+            )}
+            <div className={styles.usersList}>
+              {members.map((item, index) => (
+                <div key={index} className={styles.userCard}>
+                  <p className={styles.userName}>
+                    {item.user_firstname !== "" ? item.user_firstname : "User"}
+                  </p>
+
+                  <p className={styles.userEmail}>{item.user_email}</p>
+                  <Link
+                    to={`/user/${item.user_id}`}
+                    className={styles.userLink}
+                  >
+                    Show user
+                  </Link>
+                  {user?.user_id === company.company_owner.user_id &&
+                    item.user_id !== company.company_owner.user_id && (
+                      <div className={styles.actions}>
+                        <Button
+                          text="Delete user"
+                          type="button"
+                          variant="danger"
+                          onClick={() => openConfirmModal(item)}
+                        />
+                      </div>
+                    )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       ) : (
@@ -253,6 +343,18 @@ const CompanyPage = () => {
             irreversible"
         btnText="Yes, Delete"
       />
+      {selectedUser && (
+        <ConfirmModal
+          isOpen={isDeleteOpen}
+          onClose={() => setIsDeleteOpen(false)}
+          onConfirm={() => {
+            handleLeave(selectedUser.user_firstname, selectedUser.action_id);
+            setIsDeleteOpen(false);
+          }}
+          text={`Are you sure you want to delete ${selectedUser.user_firstname} from you company? `}
+          btnText="Yes, delete"
+        />
+      )}
       <Modal
         isOpen={isVisibilityOpen}
         onClose={() => setIsVisibilityOpen(false)}
