@@ -203,7 +203,7 @@
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 20px;
-  width: 200px;
+  width: 300px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
   margin-bottom: 2rem;
@@ -227,7 +227,8 @@
 
 .userLink {
   display: inline-block;
-  padding: 10px 15px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
   background-color: #007b;
   color: white;
 }

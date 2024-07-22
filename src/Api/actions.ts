@@ -23,3 +23,11 @@ export const requestJoin = (company_id: number) => {
 export const sendInvite = (company_id: number, user_id: number) => {
   return api.get(`/action/create_from_company/${company_id}/user/${user_id}/`);
 };
+
+export const addAdmin = (actionId: number) => {
+  return api.get(`/action/${actionId}/add_to_admin/`);
+};
+
+export const deleteAdmin = (actionId: number) => {
+  return api.get(`/action/${actionId}/remove_from_admin/`);
+};

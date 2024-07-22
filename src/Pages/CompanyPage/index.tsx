@@ -20,7 +20,7 @@ import {
 } from "../../Api/company";
 import { toast } from "react-toastify";
 import { UserResponse } from "../../Types/api";
-import { leaveCompany } from "../../Api/actions";
+import { addAdmin, deleteAdmin, leaveCompany } from "../../Api/actions";
 
 const CompanyPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -37,12 +37,25 @@ const CompanyPage = () => {
   const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [members, setMembers] = useState<UserResponse[]>([]);
+  const [admins, setAdmins] = useState<UserResponse[]>([]);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isDeleteAdminOpen, setIsDeleteAdminOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
 
   const openConfirmModal = (user: UserResponse) => {
     setSelectedUser(user);
     setIsDeleteOpen(true);
+  };
+
+  const openAdminModal = (user: UserResponse) => {
+    setSelectedUser(user);
+    setIsAdminOpen(true);
+  };
+
+  const openDeleteAdminModal = (user: UserResponse) => {
+    setSelectedUser(user);
+    setIsDeleteAdminOpen(true);
   };
 
   const company =
@@ -97,6 +110,11 @@ const CompanyPage = () => {
       company_links: (company?.company_links || []).join(", "),
     });
   }, [company]);
+
+  useEffect(() => {
+    const adminUsers = members.filter((member) => member.action === "admin");
+    setAdmins(adminUsers);
+  }, [members]);
 
   const handleVisibilityChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -179,6 +197,40 @@ const CompanyPage = () => {
       toast.success(`Member ${user_name} has been deleted`);
     } catch (error) {
       toast.error(`Failed to delete member: ${user_name}`);
+    }
+  };
+
+  const handleMakeAdmin = async (user_name: string, action_id: number) => {
+    try {
+      await addAdmin(action_id);
+      if (!id) return;
+
+      try {
+        const response = await getCompanyMembers(parseInt(id));
+        setMembers(response.data.result.users);
+      } catch (error) {
+        toast.error("Error while fetching company members");
+      }
+      toast.success(`Member ${user_name} has been promoted to admin`);
+    } catch (error) {
+      toast.error(`Failed to promote member: ${user_name}`);
+    }
+  };
+
+  const handleDeleteAdmin = async (user_name: string, action_id: number) => {
+    try {
+      await deleteAdmin(action_id);
+      if (!id) return;
+
+      try {
+        const response = await getCompanyMembers(parseInt(id));
+        setMembers(response.data.result.users);
+      } catch (error) {
+        toast.error("Error while fetching company members");
+      }
+      toast.success(`Member ${user_name} has been deleted from admins`);
+    } catch (error) {
+      toast.error(`Failed to delete admin: ${user_name}`);
     }
   };
 
@@ -324,6 +376,61 @@ const CompanyPage = () => {
                           variant="danger"
                           onClick={() => openConfirmModal(item)}
                         />
+                        {item.action !== "admin" && (
+                          <Button
+                            text="Make admin"
+                            type="button"
+                            variant="warning"
+                            onClick={() => openAdminModal(item)}
+                          />
+                        )}
+                        {item.action === "admin" && (
+                          <Button
+                            text="Delete admin"
+                            type="button"
+                            variant="danger"
+                            onClick={() => openDeleteAdminModal(item)}
+                          />
+                        )}
+                      </div>
+                    )}
+                </div>
+              ))}
+            </div>
+            {admins.length > 0 && (
+              <h1 className={styles.header}>Company admins</h1>
+            )}
+            <div className={styles.usersList}>
+              {admins.map((item, index) => (
+                <div key={index} className={styles.userCard}>
+                  <p className={styles.userName}>
+                    {item.user_firstname !== "" ? item.user_firstname : "User"}
+                  </p>
+
+                  <p className={styles.userEmail}>{item.user_email}</p>
+                  <Link
+                    to={`/user/${item.user_id}`}
+                    className={styles.userLink}
+                  >
+                    Show user
+                  </Link>
+                  {user?.user_id === company.company_owner.user_id &&
+                    item.user_id !== company.company_owner.user_id && (
+                      <div className={styles.actions}>
+                        <Button
+                          text="Delete user"
+                          type="button"
+                          variant="danger"
+                          onClick={() => openConfirmModal(item)}
+                        />
+                        {item.action === "admin" && (
+                          <Button
+                            text="Delete admin"
+                            type="button"
+                            variant="danger"
+                            onClick={() => openDeleteAdminModal(item)}
+                          />
+                        )}
                       </div>
                     )}
                 </div>
@@ -344,16 +451,44 @@ const CompanyPage = () => {
         btnText="Yes, Delete"
       />
       {selectedUser && (
-        <ConfirmModal
-          isOpen={isDeleteOpen}
-          onClose={() => setIsDeleteOpen(false)}
-          onConfirm={() => {
-            handleLeave(selectedUser.user_firstname, selectedUser.action_id);
-            setIsDeleteOpen(false);
-          }}
-          text={`Are you sure you want to delete ${selectedUser.user_firstname} from you company? `}
-          btnText="Yes, delete"
-        />
+        <>
+          <ConfirmModal
+            isOpen={isDeleteOpen}
+            onClose={() => setIsDeleteOpen(false)}
+            onConfirm={() => {
+              handleLeave(selectedUser.user_firstname, selectedUser.action_id);
+              setIsDeleteOpen(false);
+            }}
+            text={`Are you sure you want to delete ${selectedUser.user_firstname} from you company? `}
+            btnText="Yes, delete"
+          />
+          <ConfirmModal
+            isOpen={isAdminOpen}
+            onClose={() => setIsAdminOpen(false)}
+            onConfirm={() => {
+              handleMakeAdmin(
+                selectedUser.user_firstname,
+                selectedUser.action_id
+              );
+              setIsAdminOpen(false);
+            }}
+            text={`Are you sure you want to make ${selectedUser.user_firstname} admin in you company? `}
+            btnText="Yes, promote"
+          />
+          <ConfirmModal
+            isOpen={isDeleteAdminOpen}
+            onClose={() => setIsDeleteAdminOpen(false)}
+            onConfirm={() => {
+              handleDeleteAdmin(
+                selectedUser.user_firstname,
+                selectedUser.action_id
+              );
+              setIsDeleteAdminOpen(false);
+            }}
+            text={`Are you sure you want to delete ${selectedUser.user_firstname} from admins? `}
+            btnText="Yes, delete from admins"
+          />
+        </>
       )}
       <Modal
         isOpen={isVisibilityOpen}
