@@ -5,18 +5,19 @@ import { HelmetProvider } from "react-helmet-async";
 import { BrowserRouter as Router } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./Store/store";
+import Auth0ProviderWithNavigate from "./Utils/auth0-provider-with-history";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <Router>
+  <Provider store={store}>
+    <Router>
+      <Auth0ProviderWithNavigate>
         <HelmetProvider>
           <App />
         </HelmetProvider>
-      </Router>
-    </Provider>
-  </React.StrictMode>
+      </Auth0ProviderWithNavigate>
+    </Router>
+  </Provider>
 );

@@ -8,18 +8,85 @@ import UsersListPage from "./Pages/UsersListPage";
 import CompaniesListPage from "./Pages/CompaniesListPage";
 import LoginPage from "./Pages/LoginPage";
 import RegisterPage from "./Pages/RegisterPage";
+import ProtectedRoute from "./Components/ProtectedRoute";
+import UnauthenticatedRoute from "./Components/UnauthenticatedRoute";
+import { RootState, useAppDispatch } from "./Store/store";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { ReduxStatus } from "./Types/enums";
+import { fetchUser } from "./Store/user/slice";
+import "react-toastify/dist/ReactToastify.css";
+
 function App() {
+  const dispatch = useAppDispatch();
+  const token = localStorage.getItem("BearerToken");
+  const { status } = useSelector((state: RootState) => state.user);
+
+  useEffect(() => {
+    if (token && status === ReduxStatus.INIT) {
+      dispatch(fetchUser({ token }));
+    }
+  }, [dispatch, status, token]);
+
   return (
     <div className="App">
       <Routes>
         <Route path="/" element={<StartPage />}></Route>
         <Route path="/about" element={<AboutPage />}></Route>
-        <Route path="/company" element={<CompanyProfilePage />}></Route>
-        <Route path="/profile" element={<UserProfilePage />}></Route>
-        <Route path="/users-list" element={<UsersListPage />}></Route>
-        <Route path="/companies-list" element={<CompaniesListPage />}></Route>
-        <Route path="/login" element={<LoginPage />}></Route>
-        <Route path="/register" element={<RegisterPage />}></Route>
+
+        {/* //! Unauthenticated routes */}
+
+        <Route
+          path="/login"
+          element={
+            <UnauthenticatedRoute>
+              <LoginPage />
+            </UnauthenticatedRoute>
+          }
+        ></Route>
+        <Route
+          path="/register"
+          element={
+            <UnauthenticatedRoute>
+              <RegisterPage />
+            </UnauthenticatedRoute>
+          }
+        ></Route>
+
+        {/* //! Protected routes */}
+
+        <Route
+          path="/company"
+          element={
+            <ProtectedRoute>
+              <CompanyProfilePage />
+            </ProtectedRoute>
+          }
+        ></Route>
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <UserProfilePage />
+            </ProtectedRoute>
+          }
+        ></Route>
+        <Route
+          path="/users-list"
+          element={
+            <ProtectedRoute>
+              <UsersListPage />
+            </ProtectedRoute>
+          }
+        ></Route>
+        <Route
+          path="/companies-list"
+          element={
+            <ProtectedRoute>
+              <CompaniesListPage />
+            </ProtectedRoute>
+          }
+        ></Route>
       </Routes>
     </div>
   );

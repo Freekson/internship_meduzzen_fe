@@ -38,6 +38,7 @@
 
   .header__buttons {
     display: flex;
+    align-items: center;
 
     .button {
       color: #fff;
@@ -53,6 +54,10 @@
         background-color: #ffd700;
         color: #333;
       }
+    }
+
+    span {
+      margin-right: 1rem;
     }
   }
 }
