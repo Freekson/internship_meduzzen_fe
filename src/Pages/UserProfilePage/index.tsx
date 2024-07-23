@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import Layout from "../../Components/Layout";
 import styles from "./UserProfilePage.module.scss";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Store/store";
 import { FormEvent, useState } from "react";
@@ -19,13 +19,12 @@ import { fetchUser } from "../../Store/user/slice";
 import { handleLogout } from "../../Utils/handleLogout";
 import ConfirmModal from "../../Components/ConfirmModal";
 import { formChangeUserFields } from "./static";
+import CustomLink from "../../Components/CustomLink";
 
 const UserProfilePage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { userData: user, token } = useSelector(
-    (state: RootState) => state.user
-  );
+  const { userData: user } = useSelector((state: RootState) => state.user);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
@@ -163,27 +162,51 @@ const UserProfilePage = () => {
       <div className={styles.wrapper}>
         {user && (
           <div className={styles.userProfile}>
-            {user.user_avatar && (
+            {user.user_avatar ? (
               <img
                 src={user.user_avatar}
                 alt={`${user.user_firstname} ${user.user_lastname}`}
                 className={styles.avatar}
               />
+            ) : (
+              <div className={styles.placeholder}>No Avatar</div>
             )}
             <h1 className={styles.name}>
               {user.user_firstname} {user.user_lastname}
             </h1>
-            <p className={styles.email}>Email: {user.user_email}</p>
-            <p className={styles.city}>City: {user.user_city}</p>
-            <p className={styles.phone}>Phone: {user.user_phone}</p>
-            <p className={styles.status}>Status: {user.user_status}</p>
+            {user.user_email && (
+              <p className={styles.email}>
+                <b>Email:</b> {user.user_email}
+              </p>
+            )}
+            {user.user_city && (
+              <p className={styles.city}>
+                <b>City:</b> {user.user_city}
+              </p>
+            )}
+            {user.user_phone && (
+              <p className={styles.phone}>
+                <b>Phone:</b> {user.user_phone}
+              </p>
+            )}
+            {user.user_status && (
+              <p className={styles.status}>
+                <b>Status: </b>
+                {user.user_status}
+              </p>
+            )}
             {Array.isArray(user.user_links) && user.user_links.length > 0 && (
-              <div className={styles.links}>
-                <h2>Links</h2>
+              <div className={styles.user_links}>
+                <h2>Links:</h2>
                 <ul>
                   {user.user_links.map((link, index) => (
                     <li key={index}>
-                      <a href={link} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.link}
+                      >
                         {link}
                       </a>
                     </li>
@@ -203,6 +226,22 @@ const UserProfilePage = () => {
             variant="danger"
           />
         </div>
+        <form className={styles.form__wrapper} onSubmit={handleFileSubmit}>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            required
+          />
+          <Button type="submit" text="Upload Avatar" variant="warning" />
+        </form>
+
+        <div className={styles.links}>
+          <CustomLink to="/users-list" text="See all users" />
+          <CustomLink to="/user/invites" text="See my invitations" />
+          <CustomLink to="/user/requests" text="See my requests" />
+        </div>
+
         <Modal isOpen={isModalOpen} onClose={closeModal}>
           <form className={styles.form__wrapper} onSubmit={handleSubmit}>
             {formChangeUserFields.map((field) => (
@@ -252,27 +291,6 @@ const UserProfilePage = () => {
             irreversible"
           btnText="Yes, Delete"
         />
-        <form className={styles.form__wrapper} onSubmit={handleFileSubmit}>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            required
-          />
-          <Button type="submit" text="Upload Avatar" variant="warning" />
-        </form>
-
-        <div className={styles.links}>
-          <Link to="/users-list" className={styles.see_all}>
-            See all users
-          </Link>
-          <Link to="/user/invites" className={styles.see_all}>
-            See my invitations
-          </Link>
-          <Link to="/user/requests" className={styles.see_all}>
-            See my requests
-          </Link>
-        </div>
       </div>
     </Layout>
   );

@@ -8,7 +8,6 @@ import {
   fetchUsersList,
   setActivePage,
 } from "../../Store/user/slice";
-import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { ReduxStatus } from "../../Types/enums";
 import Pagination from "../../Components/Pagination";
@@ -17,6 +16,9 @@ import Modal from "../../Components/Modal";
 import Button from "../../Components/Button";
 import { TListUserItem } from "../../Store/user/types";
 import { sendInvite } from "../../Api/actions";
+import { ThreeDots } from "react-loader-spinner";
+import Notification from "../../Components/Notification";
+import CustomLink from "../../Components/CustomLink";
 
 const UsersListPage = () => {
   const dispatch = useAppDispatch();
@@ -36,6 +38,9 @@ const UsersListPage = () => {
   const page_size = 20;
   const current_page = usersList?.pagination.current_page ?? 1;
   const total_page = usersList?.pagination.total_page ?? 5;
+  const filteredCompanies = companies.filter(
+    (company) => company.action === "owner"
+  );
 
   const openModal = (user: TListUserItem) => {
     setSelectedUser(user);
@@ -102,29 +107,48 @@ const UsersListPage = () => {
 
       <div className={styles.wrapper}>
         <h1>List of users</h1>
-        <div className={styles.usersList}>
-          {usersList?.users.map((item, index) => (
-            <div key={index} className={styles.userCard}>
-              <p className={styles.userName}>
-                {item.user_firstname !== "" ? item.user_firstname : "User"}
-              </p>
+        {listStatus === ReduxStatus.LOADING ? (
+          <div className={styles.loading}>
+            <ThreeDots
+              height="80"
+              width="80"
+              radius="9"
+              color="#fb791b"
+              ariaLabel="three-dots-loading"
+              wrapperStyle={{}}
+              visible={true}
+            />
+          </div>
+        ) : listStatus === ReduxStatus.ERROR ? (
+          <div className={styles.notification}>
+            <Notification
+              type="error"
+              message="An error occurred while loading the user list."
+            />
+          </div>
+        ) : (
+          <div className={styles.usersList}>
+            {usersList?.users.map((item, index) => (
+              <div key={index} className={styles.userCard}>
+                <p className={styles.userName}>
+                  {item.user_firstname !== "" ? item.user_firstname : "User"}
+                </p>
 
-              <p className={styles.userEmail}>{item.user_email}</p>
-              <div className={styles.actions}>
-                <Link to={`/user/${item.user_id}`} className={styles.userLink}>
-                  Show user
-                </Link>
-                {item.user_id !== user?.user_id && (
-                  <Button
-                    text="Invite user"
-                    type="button"
-                    onClick={() => openModal(item)}
-                  />
-                )}
+                <p className={styles.userEmail}>{item.user_email}</p>
+                <div className={styles.actions}>
+                  <CustomLink to={`/user/${item.user_id}`} text="Show user" />
+                  {item.user_id !== user?.user_id && companies.length > 0 && (
+                    <Button
+                      text="Invite user"
+                      type="button"
+                      onClick={() => openModal(item)}
+                    />
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {selectedUser && (
           <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
@@ -150,7 +174,7 @@ const UsersListPage = () => {
                   <option value="" disabled>
                     Select a company
                   </option>
-                  {companies.map((company) => (
+                  {filteredCompanies.map((company) => (
                     <option key={company.company_id} value={company.company_id}>
                       {company.company_name}
                     </option>

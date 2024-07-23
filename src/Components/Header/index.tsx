@@ -6,6 +6,7 @@ import { ReduxStatus } from "../../Types/enums";
 import { useAuth0 } from "@auth0/auth0-react";
 import Button from "../Button";
 import { handleLogout } from "../../Utils/handleLogout";
+import CustomLink from "../CustomLink";
 const Header: React.FC = () => {
   const { status, userData } = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
@@ -38,7 +39,12 @@ const Header: React.FC = () => {
         {isAuthenticated ? (
           <>
             <span>{user?.given_name}</span>
-            <Button type="button" text="Logout" onClick={() => logout()} />
+            <Button
+              type="button"
+              text="Logout"
+              variant="danger"
+              onClick={() => logout()}
+            />
           </>
         ) : status === ReduxStatus.SUCCESS && userData ? (
           <>
@@ -46,18 +52,15 @@ const Header: React.FC = () => {
             <Button
               type="button"
               text="Logout"
+              variant="danger"
               onClick={() => handleLogout(dispatch, navigate)}
             ></Button>
           </>
         ) : (
-          <>
-            <Link to="/login" className={styles.button}>
-              Login
-            </Link>
-            <Link to="/register" className={styles.button}>
-              Register
-            </Link>
-          </>
+          <div className={styles.actions}>
+            <CustomLink to="/login" text="Login" variant="primary" />
+            <CustomLink to="/register" text="Register" variant="primary" />
+          </div>
         )}
       </div>
     </header>
