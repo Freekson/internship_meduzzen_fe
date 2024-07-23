@@ -81,7 +81,6 @@ const UsersListPage = () => {
     if (token && listStatus === ReduxStatus.INIT) {
       dispatch(
         fetchUsersList({
-          token,
           page: usersList?.pagination.current_page ?? 1,
           page_size,
         })
@@ -91,9 +90,7 @@ const UsersListPage = () => {
 
   useEffect(() => {
     if (token) {
-      dispatch(
-        fetchCompanies({ token: token ?? "", user_id: user?.user_id ?? 0 })
-      );
+      dispatch(fetchCompanies({ user_id: user?.user_id ?? 0 }));
     }
   }, [dispatch, token, user]);
 

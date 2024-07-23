@@ -36,7 +36,7 @@ export interface CreateCompanyFormData {
   is_visible: boolean;
 }
 
-export type UserResponse = {
+export type UserFullResponse = {
   status_code: number;
   detail: string;
   result: TUser;
@@ -65,3 +65,13 @@ export type CompanyResponse = {
   detail: string;
   result: CompanyDetails;
 };
+
+export interface UserResponse {
+  user_id: number;
+  user_email: string;
+  user_firstname: string;
+  user_lastname: string;
+  user_avatar: string;
+  action_id: number;
+  action: string;
+}

@@ -76,9 +76,7 @@ const CompaniesListPage = () => {
 
   useEffect(() => {
     if (token) {
-      dispatch(
-        fetchCompanies({ token: token ?? "", user_id: user?.user_id ?? 0 })
-      );
+      dispatch(fetchCompanies({ user_id: user?.user_id ?? 0 }));
     }
   }, [dispatch, token, user]);
 

@@ -34,27 +34,27 @@ export const fetchUser = createAsyncThunk<TUser, string>(
 
 export const fetchUsersList = createAsyncThunk<
   UsersResult,
-  { token: string; page: number; page_size: number }
+  { page: number; page_size: number }
 >("user/fetchUsersList", async ({ page, page_size }) => {
   const data = await fetchUsersListFromApi(page, page_size);
   return data;
 });
 
-export const fetchUserById = createAsyncThunk<
-  TUser,
-  { token: string; user_id: number }
->("user/fetchUserById", async ({ user_id }) => {
-  const data = await fetchUserByIdFromApi(user_id);
-  return data;
-});
+export const fetchUserById = createAsyncThunk<TUser, { user_id: number }>(
+  "user/fetchUserById",
+  async ({ user_id }) => {
+    const data = await fetchUserByIdFromApi(user_id);
+    return data;
+  }
+);
 
-export const fetchCompanies = createAsyncThunk<
-  TCompany[],
-  { token: string; user_id: number }
->("user/fetchCompanies", async ({ user_id }) => {
-  const data = await fetchCompaniesFromApi(user_id);
-  return data;
-});
+export const fetchCompanies = createAsyncThunk<TCompany[], { user_id: number }>(
+  "user/fetchCompanies",
+  async ({ user_id }) => {
+    const data = await fetchCompaniesFromApi(user_id);
+    return data;
+  }
+);
 
 const userSlice = createSlice({
   name: "user",

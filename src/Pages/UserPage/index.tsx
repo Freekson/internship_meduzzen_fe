@@ -22,7 +22,6 @@ const UserPage: React.FC = () => {
     if (token && id) {
       dispatch(
         fetchUserById({
-          token,
           user_id: Number(id),
         })
       );

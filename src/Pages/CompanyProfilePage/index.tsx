@@ -61,61 +61,33 @@ const CompanyProfilePage: React.FC = () => {
 
     const { errors, isValid } = validateCreateCompanyFormData(formData);
 
-    if (companies.length >= 5) {
-      toast.warning("You have too many companies");
-    } else {
-      if (isValid) {
-        setErrors({});
-        try {
-          await createCompany(formData);
-          setIsModalOpen(false);
-          toast.success("Company created");
-          dispatch(
-            fetchCompanies({ token: token ?? "", user_id: user?.user_id ?? 0 })
-          );
-        } catch (error: any) {
-          toast.error(`${error.response.data.detail}`);
-        }
-      } else {
-        setErrors(errors);
+    if (isValid) {
+      setErrors({});
+      try {
+        await createCompany(formData);
+        setIsModalOpen(false);
+        toast.success("Company created");
+        dispatch(fetchCompanies({ user_id: user?.user_id ?? 0 }));
+      } catch (error: any) {
+        toast.error(`${error.response.data.detail}`);
       }
+    } else {
+      setErrors(errors);
     }
   };
 
   const handleLeave = async (company_name: string, action_id: number) => {
     try {
       await leaveCompany(action_id);
-      dispatch(
-        fetchCompanies({ token: token ?? "", user_id: user?.user_id ?? 0 })
-      );
+      dispatch(fetchCompanies({ user_id: user?.user_id ?? 0 }));
       toast.success(`You leave company: ${company_name}`);
     } catch (error) {
       toast.error(`Failed to leave company: ${company_name}`);
-    if (companies.length >= 5) {
-      toast.warning("You have too many companies");
-    } else {
-      if (isValid) {
-        setErrors({});
-        try {
-          await createCompany(formData);
-          setIsModalOpen(false);
-          toast.success("Company created");
-          dispatch(
-            fetchCompanies({ token: token ?? "", user_id: user?.user_id ?? 0 })
-          );
-        } catch (error: any) {
-          toast.error(`${error.response.data.detail}`);
-        }
-      } else {
-        setErrors(errors);
-      }
     }
   };
 
   useEffect(() => {
-    dispatch(
-      fetchCompanies({ token: token ?? "", user_id: user?.user_id ?? 0 })
-    );
+    dispatch(fetchCompanies({ user_id: user?.user_id ?? 0 }));
   }, [dispatch, token, user]);
 
   return (
