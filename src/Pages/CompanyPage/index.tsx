@@ -454,12 +454,7 @@ const CompanyPage = () => {
                   </p>
 
                   <p className={styles.userEmail}>{item.user_email}</p>
-                  <Link
-                    to={`/user/${item.user_id}`}
-                    className={styles.userLink}
-                  >
-                    Show user
-                  </Link>
+                  <CustomLink to={`/user/${item.user_id}`} text="Show user" />
                   {user?.user_id === company.company_owner.user_id &&
                     item.user_id !== company.company_owner.user_id && (
                       <div className={styles.actions}>

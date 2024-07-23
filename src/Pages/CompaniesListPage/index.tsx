@@ -68,7 +68,9 @@ const CompaniesListPage = () => {
       }
     } catch (error: any) {
       if (error.response.data.detail === "you cannot send this request 1") {
-        toast.warning("You have already sent an invite to this company");
+        toast.warning(
+          "You have already sent an invite to this company, or company already invited you"
+        );
       } else {
         toast.error("Error sending request to join");
       }
