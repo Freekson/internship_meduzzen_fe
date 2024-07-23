@@ -23,9 +23,7 @@ import { formChangeUserFields } from "./static";
 const UserProfilePage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { userData: user, token } = useSelector(
-    (state: RootState) => state.user
-  );
+  const { userData: user } = useSelector((state: RootState) => state.user);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
@@ -93,11 +91,10 @@ const UserProfilePage = () => {
 
     try {
       await updateUser(user?.user_id ?? 0, updatedFormData);
-      await dispatch(fetchUser({ token: token ?? "" }));
+      await dispatch(fetchUser(""));
 
       toast.success("User updated successfully");
     } catch (error) {
-      toast.error("Failed to update user.");
       toast.error("Failed to update user.");
     }
   };
@@ -137,7 +134,7 @@ const UserProfilePage = () => {
 
     try {
       await updateAvatar(user?.user_id ?? 0, avatarData);
-      await dispatch(fetchUser({ token: token ?? "" }));
+      await dispatch(fetchUser(""));
       toast.success("Avatar updated successfully");
     } catch (error) {
       toast.error("Failed to update avatar.");

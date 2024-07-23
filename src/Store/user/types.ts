@@ -26,12 +26,6 @@ export type TUser = {
   is_superuser: boolean;
 };
 
-export type UserResponse = {
-  status_code: number;
-  detail: string;
-  result: TUser;
-};
-
 export type TListUserItem = {
   user_id: number;
   user_email: string;
@@ -43,18 +37,4 @@ export type TListUserItem = {
 export type UsersResult = {
   users: TListUserItem[];
   pagination: TPagination;
-};
-
-export type UsersListResponse = {
-  status_code: number;
-  detail: string;
-  result: UsersResult;
-};
-
-export type CompaniesResponse = {
-  status_code: number;
-  detail: string;
-  result: {
-    companies: TCompany[];
-  };
 };

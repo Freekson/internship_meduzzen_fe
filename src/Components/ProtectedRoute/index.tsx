@@ -17,7 +17,7 @@ const ProtectedRoute: React.FC<TProps> = ({ children }) => {
 
   useEffect(() => {
     if (token && status === ReduxStatus.INIT) {
-      dispatch(fetchUser({ token }));
+      dispatch(fetchUser(""));
     }
   }, [dispatch, status, token]);
 

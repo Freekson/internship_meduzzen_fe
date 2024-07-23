@@ -9,15 +9,9 @@ export interface companyState {
   byIdStatus: ReduxStatus;
 }
 
-export type UsersResult = {
+export type CompaniesResult = {
   companies: TCompany[];
   pagination: TPagination;
-};
-
-export type CompaniesAllResponse = {
-  status_code: number;
-  detail: string;
-  result: UsersResult;
 };
 
 export interface CompanyOwner {
@@ -40,9 +34,3 @@ export interface CompanyDetails {
   company_links: string[];
   company_owner: CompanyOwner;
 }
-
-export type CompanyResponse = {
-  status_code: number;
-  detail: string;
-  result: CompanyDetails;
-};

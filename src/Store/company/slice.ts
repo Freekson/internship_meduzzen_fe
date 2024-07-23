@@ -1,14 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-
-import api from "../../Api/api";
 import { ReduxStatus } from "../../Types/enums";
+import { CompanyDetails, companyState, CompaniesResult } from "./types";
 import {
-  CompaniesAllResponse,
-  CompanyDetails,
-  CompanyResponse,
-  companyState,
-  UsersResult,
-} from "./types";
+  fetchAllCompaniesFromApi,
+  fetchCompanyByIdFromApi,
+} from "../../Api/company";
 
 const initialState: companyState = {
   companies: [],
@@ -19,24 +15,17 @@ const initialState: companyState = {
 };
 
 export const fetchAllCompanies = createAsyncThunk<
-  UsersResult,
-  { token: string; page: number; page_size: number }
->("company/fetchAllCompanies", async ({ token, page, page_size }) => {
-  const { data } = await api.get<CompaniesAllResponse>(`/companies/`, {
-    headers: { Authorization: `Bearer ${token}` },
-    params: { page, page_size },
-  });
-  return data.result;
+  CompaniesResult,
+  { page: number; page_size: number }
+>("company/fetchAllCompanies", async ({ page, page_size }) => {
+  return fetchAllCompaniesFromApi(page, page_size);
 });
 
 export const fetchCompanyById = createAsyncThunk<
   CompanyDetails,
-  { token: string; company_id: number }
->("user/fetchUserById", async ({ token, company_id }) => {
-  const { data } = await api.get<CompanyResponse>(`/company/${company_id}/`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return data.result;
+  { company_id: number }
+>("company/fetchCompanyById", async ({ company_id }) => {
+  return fetchCompanyByIdFromApi(company_id);
 });
 
 const companySlice = createSlice({

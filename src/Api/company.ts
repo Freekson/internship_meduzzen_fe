@@ -1,4 +1,9 @@
-import { CreateCompanyFormData } from "../Types/api";
+import { CompaniesResult, CompanyDetails } from "../Store/company/types";
+import {
+  CompaniesAllResponse,
+  CompanyResponse,
+  CreateCompanyFormData,
+} from "../Types/api";
 import api from "./api";
 
 interface Company {
@@ -27,4 +32,21 @@ export const updateCompany = (companyId: number, companyData: Company) => {
 
 export const deleteCompany = (companyId: number) => {
   return api.delete(`/company/${companyId}/`);
+};
+
+export const fetchAllCompaniesFromApi = async (
+  page: number,
+  page_size: number
+): Promise<CompaniesResult> => {
+  const { data } = await api.get<CompaniesAllResponse>(`/companies/`, {
+    params: { page, page_size },
+  });
+  return data.result;
+};
+
+export const fetchCompanyByIdFromApi = async (
+  company_id: number
+): Promise<CompanyDetails> => {
+  const { data } = await api.get<CompanyResponse>(`/company/${company_id}/`);
+  return data.result;
 };

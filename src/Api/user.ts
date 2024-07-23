@@ -1,10 +1,14 @@
-import { TUser } from "../Store/user/types";
+import { TUser, UsersResult } from "../Store/user/types";
 import {
   ChangePasswordParams,
+  CompaniesResponse,
   LoginFormData,
   LoginResponse,
   RegisterFormData,
+  UserResponse,
+  UsersListResponse,
 } from "../Types/api";
+import { TCompany } from "../Types/types";
 import api, { apiWithoutAuth } from "./api";
 
 export const createUser = (formData: RegisterFormData) => {
@@ -46,4 +50,33 @@ export const updateAvatar = (userId: number, avatarData: FormData) => {
 
 export const deleteUser = (userId: number) => {
   return api.delete(`/user/${userId}/`);
+};
+
+export const fetchUserFromApi = async (): Promise<TUser> => {
+  const { data } = await api.get<UserResponse>(`/auth/me/`);
+  return data.result;
+};
+
+export const fetchUsersListFromApi = async (
+  page: number,
+  page_size: number
+): Promise<UsersResult> => {
+  const { data } = await api.get<UsersListResponse>(`/users/`, {
+    params: { page, page_size },
+  });
+  return data.result;
+};
+
+export const fetchUserByIdFromApi = async (user_id: number): Promise<TUser> => {
+  const { data } = await api.get<UserResponse>(`/user/${user_id}/`);
+  return data.result;
+};
+
+export const fetchCompaniesFromApi = async (
+  user_id: number
+): Promise<TCompany[]> => {
+  const { data } = await api.get<CompaniesResponse>(
+    `/user/${user_id}/companies_list/`
+  );
+  return data.result.companies;
 };

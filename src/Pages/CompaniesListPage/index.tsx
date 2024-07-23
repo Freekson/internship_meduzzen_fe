@@ -11,16 +11,6 @@ import { useSelector } from "react-redux";
 import { ReduxStatus } from "../../Types/enums";
 import Pagination from "../../Components/Pagination";
 import { Link } from "react-router-dom";
-import { useEffect } from "react";
-import { RootState, useAppDispatch } from "../../Store/store";
-import {
-  fetchAllCompanies,
-  setActiveCompanyPage,
-} from "../../Store/company/slice";
-import { useSelector } from "react-redux";
-import { ReduxStatus } from "../../Types/enums";
-import Pagination from "../../Components/Pagination";
-import { Link } from "react-router-dom";
 
 const CompaniesListPage = () => {
   const dispatch = useAppDispatch();
@@ -52,7 +42,6 @@ const CompaniesListPage = () => {
     if (companiesStatus === ReduxStatus.INIT) {
       dispatch(
         fetchAllCompanies({
-          token: token ?? "",
           page: pagination?.current_page ?? 1,
           page_size,
         })

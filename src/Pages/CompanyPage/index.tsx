@@ -54,7 +54,6 @@ const CompanyPage = () => {
     if (token && id) {
       dispatch(
         fetchCompanyById({
-          token,
           company_id: Number(id),
         })
       );
@@ -105,7 +104,6 @@ const CompanyPage = () => {
       await updateVisibility(company?.company_id ?? 0, isVisible);
       await dispatch(
         fetchCompanyById({
-          token: token ?? "",
           company_id: Number(id),
         })
       );
@@ -131,7 +129,6 @@ const CompanyPage = () => {
       await updateCompany(company?.company_id ?? 0, updatedFormData);
       await dispatch(
         fetchCompanyById({
-          token: token ?? "",
           company_id: Number(id),
         })
       );

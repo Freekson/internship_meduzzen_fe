@@ -1,16 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-import api from "../../Api/api";
 import { ReduxStatus } from "../../Types/enums";
-import {
-  CompaniesResponse,
-  TUser,
-  UserResponse,
-  UsersListResponse,
-  UsersResult,
-  userState,
-} from "./types";
+import { TUser, UsersResult, userState } from "./types";
 import { TCompany } from "../../Types/types";
+import {
+  fetchCompaniesFromApi,
+  fetchUserByIdFromApi,
+  fetchUserFromApi,
+  fetchUsersListFromApi,
+} from "../../Api/user";
 
 const tokenLS = localStorage.getItem("BearerToken");
 
@@ -26,48 +24,36 @@ const initialState: userState = {
   companiesStatus: ReduxStatus.INIT,
 };
 
-export const fetchUser = createAsyncThunk<TUser, { token: string }>(
+export const fetchUser = createAsyncThunk<TUser, string>(
   "user/fetchUser",
-  async ({ token }) => {
-    const { data } = await api.get<UserResponse>(`/auth/me/`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return data.result;
+  async () => {
+    const data = await fetchUserFromApi();
+    return data;
   }
 );
 
 export const fetchUsersList = createAsyncThunk<
   UsersResult,
   { token: string; page: number; page_size: number }
->("user/fetchUsersList", async ({ token, page, page_size }) => {
-  const { data } = await api.get<UsersListResponse>(`/users/`, {
-    headers: { Authorization: `Bearer ${token}` },
-    params: { page, page_size },
-  });
-  return data.result;
+>("user/fetchUsersList", async ({ page, page_size }) => {
+  const data = await fetchUsersListFromApi(page, page_size);
+  return data;
 });
 
 export const fetchUserById = createAsyncThunk<
   TUser,
   { token: string; user_id: number }
->("user/fetchUserById", async ({ token, user_id }) => {
-  const { data } = await api.get<UserResponse>(`/user/${user_id}/`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return data.result;
+>("user/fetchUserById", async ({ user_id }) => {
+  const data = await fetchUserByIdFromApi(user_id);
+  return data;
 });
 
 export const fetchCompanies = createAsyncThunk<
   TCompany[],
   { token: string; user_id: number }
->("user/fetchCompanies", async ({ token, user_id }) => {
-  const { data } = await api.get<CompaniesResponse>(
-    `/user/${user_id}/companies_list/`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-  return data.result.companies;
+>("user/fetchCompanies", async ({ user_id }) => {
+  const data = await fetchCompaniesFromApi(user_id);
+  return data;
 });
 
 const userSlice = createSlice({
