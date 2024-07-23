@@ -98,6 +98,7 @@ const UserProfilePage = () => {
       toast.success("User updated successfully");
     } catch (error) {
       toast.error("Failed to update user.");
+      toast.error("Failed to update user.");
     }
   };
 

@@ -13,6 +13,18 @@ import { validateCreateCompanyFormData } from "../../Utils/formValidation";
 import Modal from "../../Components/Modal";
 import { createCompany } from "../../Api/company";
 import { Link } from "react-router-dom";
+import { FormEvent, useEffect, useState } from "react";
+import { RootState, useAppDispatch } from "../../Store/store";
+import { fetchCompanies } from "../../Store/user/slice";
+import { useSelector } from "react-redux";
+import Button from "../../Components/Button";
+import { CreateCompanyFormData } from "../../Types/api";
+import { toast } from "react-toastify";
+import InputLabel from "../../Components/InputLabel";
+import { validateCreateCompanyFormData } from "../../Utils/formValidation";
+import Modal from "../../Components/Modal";
+import { createCompany } from "../../Api/company";
+import { Link } from "react-router-dom";
 
 const CompanyProfilePage: React.FC = () => {
   const dispatch = useAppDispatch();
