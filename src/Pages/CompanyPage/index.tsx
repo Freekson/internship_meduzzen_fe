@@ -422,6 +422,53 @@ const CompanyPage = () => {
                           variant="danger"
                           onClick={() => openConfirmModal(item)}
                         />
+                        {item.action !== "admin" && (
+                          <Button
+                            text="Make admin"
+                            type="button"
+                            variant="warning"
+                            onClick={() => openAdminModal(item)}
+                          />
+                        )}
+                        {item.action === "admin" && (
+                          <Button
+                            text="Delete admin"
+                            type="button"
+                            variant="danger"
+                            onClick={() => openDeleteAdminModal(item)}
+                          />
+                        )}
+                      </div>
+                    )}
+                </div>
+              ))}
+            </div>
+            {admins.length > 0 && (
+              <h1 className={styles.header}>Company admins</h1>
+            )}
+            <div className={styles.usersList}>
+              {admins.map((item, index) => (
+                <div key={index} className={styles.userCard}>
+                  <p className={styles.userName}>
+                    {item.user_firstname !== "" ? item.user_firstname : "User"}
+                  </p>
+
+                  <p className={styles.userEmail}>{item.user_email}</p>
+                  <Link
+                    to={`/user/${item.user_id}`}
+                    className={styles.userLink}
+                  >
+                    Show user
+                  </Link>
+                  {user?.user_id === company.company_owner.user_id &&
+                    item.user_id !== company.company_owner.user_id && (
+                      <div className={styles.actions}>
+                        <Button
+                          text="Delete user"
+                          type="button"
+                          variant="danger"
+                          onClick={() => openConfirmModal(item)}
+                        />
                         {item.action === "admin" && (
                           <Button
                             text="Delete admin"
