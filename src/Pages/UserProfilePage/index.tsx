@@ -17,6 +17,7 @@ import {
 import { toast } from "react-toastify";
 import { fetchUser } from "../../Store/user/slice";
 import { handleLogout } from "../../Utils/handleLogout";
+import { formChangeUserFields } from "./static";
 
 const UserProfilePage = () => {
   const dispatch = useAppDispatch();
@@ -203,65 +204,18 @@ const UserProfilePage = () => {
         </div>
         <Modal isOpen={isModalOpen} onClose={closeModal}>
           <form className={styles.form__wrapper} onSubmit={handleSubmit}>
-            <InputLabel
-              label="Email"
-              type="email"
-              id="user_email"
-              name="user_email"
-              value={formData.user_email}
-              required
-              onChange={handleChange}
-            />
-            <InputLabel
-              label="First Name"
-              type="text"
-              id="user_firstname"
-              name="user_firstname"
-              value={formData.user_firstname}
-              onChange={handleChange}
-              required
-            />
-            <InputLabel
-              label="Last Name"
-              type="text"
-              id="user_lastname"
-              name="user_lastname"
-              value={formData.user_lastname}
-              onChange={handleChange}
-              required
-            />
-            <InputLabel
-              label="City"
-              type="text"
-              id="user_city"
-              name="user_city"
-              value={formData.user_city}
-              onChange={handleChange}
-            />
-            <InputLabel
-              label="Phone"
-              type="tel"
-              id="user_phone"
-              name="user_phone"
-              value={formData.user_phone}
-              onChange={handleChange}
-            />
-            <InputLabel
-              label="Status"
-              type="text"
-              id="user_status"
-              name="user_status"
-              value={formData.user_status}
-              onChange={handleChange}
-            />
-            <InputLabel
-              label="Links (comma separated)"
-              id="user_links"
-              type="text"
-              name="user_links"
-              value={formData.user_links}
-              onChange={handleChange}
-            />
+            {formChangeUserFields.map((field) => (
+              <InputLabel
+                key={field.id}
+                label={field.label}
+                type={field.type}
+                id={field.id}
+                name={field.name}
+                value={formData[field.name]}
+                required={field.required}
+                onChange={handleChange}
+              />
+            ))}
             <Button text="Change user" type="submit" />
           </form>
         </Modal>
