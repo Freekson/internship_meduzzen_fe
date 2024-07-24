@@ -18,7 +18,8 @@
   min-width: 400px;
   max-width: 90%;
   max-height: 90vh;
-  overflow: hidden;
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: hidden; /* Disable horizontal scrolling */
   position: relative;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 }
@@ -32,4 +33,28 @@
   font-size: 24px;
   cursor: pointer;
   color: #888;
+}
+
+/* Custom Scrollbar Styles */
+.modal::-webkit-scrollbar {
+  width: 12px;
+}
+
+.modal::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 8px; /* Apply border radius to the track */
+}
+
+.modal::-webkit-scrollbar-thumb {
+  background: #007bff;
+  border-radius: 8px; /* Apply border radius to the thumb */
+  border: 3px solid #f1f1f1; /* To create space between the thumb and the track */
+}
+
+.modal::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.modal::-webkit-scrollbar-corner {
+  background: #f1f1f1;
 }

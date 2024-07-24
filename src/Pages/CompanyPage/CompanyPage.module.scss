@@ -192,7 +192,7 @@
   margin-top: 1rem;
 }
 
-.userCard {
+.card {
   background-color: #f9f9f9;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -201,22 +201,37 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
   margin-bottom: 2rem;
-}
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
 
-.userCard:hover {
-  transform: scale(1.05);
-}
+  &:hover {
+    transform: scale(1.05);
+  }
 
-.userName {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
+  .userName,
+  .quizName,
+  .quizTitle {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-.userEmail {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 10px;
+  .userEmail,
+  .quizDescription {
+    font-size: 14px;
+    color: #666;
+    max-width: 250px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .header {

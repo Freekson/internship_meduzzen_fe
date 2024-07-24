@@ -7,9 +7,11 @@ interface InputLabelProps {
   name: string;
   type: string;
   required?: boolean;
-  value: string;
+  value: string | number;
   disabled?: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  min?: number;
+  max?: number;
 }
 
 const InputLabel: React.FC<InputLabelProps> = React.memo(
@@ -22,6 +24,8 @@ const InputLabel: React.FC<InputLabelProps> = React.memo(
     value,
     disabled = false,
     onChange,
+    min = 0,
+    max = 100,
   }) => {
     return (
       <>
@@ -35,6 +39,8 @@ const InputLabel: React.FC<InputLabelProps> = React.memo(
           onChange={onChange}
           className={styles.input}
           disabled={disabled}
+          min={min}
+          max={max}
         />
       </>
     );
