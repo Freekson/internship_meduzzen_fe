@@ -23,7 +23,9 @@ import { formChangeUserFields } from "./static";
 const UserProfilePage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { userData: user } = useSelector((state: RootState) => state.user);
+  const { userData: user, token } = useSelector(
+    (state: RootState) => state.user
+  );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
@@ -260,9 +262,17 @@ const UserProfilePage = () => {
           <Button type="submit" text="Upload Avatar" variant="warning" />
         </form>
 
-        <Link to="/users-list" className={styles.see_all}>
-          See all users
-        </Link>
+        <div className={styles.links}>
+          <Link to="/users-list" className={styles.see_all}>
+            See all users
+          </Link>
+          <Link to="/user/invites" className={styles.see_all}>
+            See my invitations
+          </Link>
+          <Link to="/user/requests" className={styles.see_all}>
+            See my requests
+          </Link>
+        </div>
       </div>
     </Layout>
   );

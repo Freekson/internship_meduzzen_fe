@@ -5,7 +5,7 @@ import {
   LoginFormData,
   LoginResponse,
   RegisterFormData,
-  UserResponse,
+  UserFullResponse,
   UsersListResponse,
 } from "../Types/api";
 import { TCompany } from "../Types/types";
@@ -29,6 +29,7 @@ export const loginUser = (formData: LoginFormData): Promise<LoginResponse> => {
     })
     .then((response) => response.data);
 };
+
 export const updateUser = (userId: number, userData: Partial<TUser>) => {
   return api.put(`/user/${userId}/update_info/`, userData);
 };
@@ -52,8 +53,16 @@ export const deleteUser = (userId: number) => {
   return api.delete(`/user/${userId}/`);
 };
 
+export const getUserInvitation = (userId: number) => {
+  return api.get(`/user/${userId}/invites_list/`);
+};
+
+export const getUserRequests = (userId: number) => {
+  return api.get(`/user/${userId}/requests_list/`);
+};
+
 export const fetchUserFromApi = async (): Promise<TUser> => {
-  const { data } = await api.get<UserResponse>(`/auth/me/`);
+  const { data } = await api.get<UserFullResponse>(`/auth/me/`);
   return data.result;
 };
 
@@ -68,7 +77,7 @@ export const fetchUsersListFromApi = async (
 };
 
 export const fetchUserByIdFromApi = async (user_id: number): Promise<TUser> => {
-  const { data } = await api.get<UserResponse>(`/user/${user_id}/`);
+  const { data } = await api.get<UserFullResponse>(`/user/${user_id}/`);
   return data.result;
 };
 

@@ -34,6 +34,24 @@ export const deleteCompany = (companyId: number) => {
   return api.delete(`/company/${companyId}/`);
 };
 
+export const getCompanyRequests = (companyId: number) => {
+  return api.get(`/company/${companyId}/requests_list/`);
+};
+
+export const getCompanyInvitation = (companyId: number) => {
+  return api.get(`/company/${companyId}/invites_list/`);
+};
+
+export const getCompanyMembers = (companyId: number) => {
+  return api.get(`/company/${companyId}/members_list/`);
+};
+
+export const fetchCompanyByIdFromApi = async (
+  company_id: number
+): Promise<CompanyDetails> => {
+  const { data } = await api.get<CompanyResponse>(`/company/${company_id}/`);
+  return data.result;
+};
 export const fetchAllCompaniesFromApi = async (
   page: number,
   page_size: number
@@ -41,12 +59,5 @@ export const fetchAllCompaniesFromApi = async (
   const { data } = await api.get<CompaniesAllResponse>(`/companies/`, {
     params: { page, page_size },
   });
-  return data.result;
-};
-
-export const fetchCompanyByIdFromApi = async (
-  company_id: number
-): Promise<CompanyDetails> => {
-  const { data } = await api.get<CompanyResponse>(`/company/${company_id}/`);
   return data.result;
 };
