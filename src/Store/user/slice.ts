@@ -1,14 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-import api from "../../Api/api";
 import { ReduxStatus } from "../../Types/enums";
+import { TUser, UsersResult, userState } from "./types";
+import { TCompany } from "../../Types/types";
 import {
-  TUser,
-  UserResponse,
-  UsersListResponse,
-  UsersResult,
-  userState,
-} from "./types";
+  fetchCompaniesFromApi,
+  fetchUserByIdFromApi,
+  fetchUserFromApi,
+  fetchUsersListFromApi,
+} from "../../Api/user";
 
 const tokenLS = localStorage.getItem("BearerToken");
 
@@ -17,40 +17,43 @@ const initialState: userState = {
   userData: null,
   usersList: null,
   fetchedById: [],
+  companies: [],
   status: ReduxStatus.INIT,
   listStatus: ReduxStatus.INIT,
   fetchedByIdStatus: ReduxStatus.INIT,
+  companiesStatus: ReduxStatus.INIT,
 };
 
-export const fetchUser = createAsyncThunk<TUser, { token: string }>(
+export const fetchUser = createAsyncThunk<TUser, string>(
   "user/fetchUser",
-  async ({ token }) => {
-    const { data } = await api.get<UserResponse>(`/auth/me/`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return data.result;
+  async () => {
+    const data = await fetchUserFromApi();
+    return data;
   }
 );
 
 export const fetchUsersList = createAsyncThunk<
   UsersResult,
   { token: string; page: number; page_size: number }
->("user/fetchUsersList", async ({ token, page, page_size }) => {
-  const { data } = await api.get<UsersListResponse>(`/users/`, {
-    headers: { Authorization: `Bearer ${token}` },
-    params: { page, page_size },
-  });
-  return data.result;
+>("user/fetchUsersList", async ({ page, page_size }) => {
+  const data = await fetchUsersListFromApi(page, page_size);
+  return data;
 });
 
 export const fetchUserById = createAsyncThunk<
   TUser,
   { token: string; user_id: number }
->("user/fetchUserById", async ({ token, user_id }) => {
-  const { data } = await api.get<UserResponse>(`/user/${user_id}/`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return data.result;
+>("user/fetchUserById", async ({ user_id }) => {
+  const data = await fetchUserByIdFromApi(user_id);
+  return data;
+});
+
+export const fetchCompanies = createAsyncThunk<
+  TCompany[],
+  { token: string; user_id: number }
+>("user/fetchCompanies", async ({ user_id }) => {
+  const data = await fetchCompaniesFromApi(user_id);
+  return data;
 });
 
 const userSlice = createSlice({
@@ -121,6 +124,19 @@ const userSlice = createSlice({
     });
     builder.addCase(fetchUserById.rejected, (state) => {
       state.fetchedByIdStatus = ReduxStatus.ERROR;
+    });
+
+    builder.addCase(fetchCompanies.pending, (state) => {
+      state.companies = [];
+      state.companiesStatus = ReduxStatus.LOADING;
+    });
+    builder.addCase(fetchCompanies.fulfilled, (state, action) => {
+      state.companies = action.payload;
+      state.companiesStatus = ReduxStatus.SUCCESS;
+    });
+    builder.addCase(fetchCompanies.rejected, (state) => {
+      state.companies = [];
+      state.companiesStatus = ReduxStatus.ERROR;
     });
   },
 });

@@ -6,9 +6,122 @@
   h1 {
     font-weight: bold;
     font-size: 3rem;
+    margin-bottom: 2rem;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+
+  h2 {
+    font-weight: bold;
+    margin-bottom: 2rem;
+    font-size: 1.2rem;
   }
 
-  p {
+  button {
     margin-top: 1rem;
   }
+}
+
+.btn_wrapper {
+  display: flex;
+  justify-content: center;
+  height: 50px;
+  margin-top: 2rem;
+
+  a {
+    margin-left: 2rem;
+  }
+}
+.see_all {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #007bff;
+  text-decoration: none;
+  border: 1px solid #007bff;
+  border-radius: 5px;
+  background-color: #f8f9fa;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+
+  &:hover {
+    background-color: #007bff;
+    color: #ffffff;
+    border-color: #007bff;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
+  }
+}
+
+.companyList {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.companyCard {
+  width: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+
+  .company_btns {
+    button:not(:last-child) {
+      margin-right: 1rem;
+    }
+  }
+}
+
+.companyAvatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 1rem;
+}
+
+.avatarPlaceholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  color: #888;
+  text-align: center;
+}
+
+.companyDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.companyName {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.companyId,
+.companyTitle,
+.companyVisibility,
+.companyAction {
+  margin: 0.2rem 0;
+  font-size: 0.9rem;
 }

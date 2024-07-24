@@ -17,14 +17,13 @@ import {
 import { toast } from "react-toastify";
 import { fetchUser } from "../../Store/user/slice";
 import { handleLogout } from "../../Utils/handleLogout";
+import ConfirmModal from "../../Components/ConfirmModal";
 import { formChangeUserFields } from "./static";
 
 const UserProfilePage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { userData: user, token } = useSelector(
-    (state: RootState) => state.user
-  );
+  const { userData: user } = useSelector((state: RootState) => state.user);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
@@ -92,11 +91,11 @@ const UserProfilePage = () => {
 
     try {
       await updateUser(user?.user_id ?? 0, updatedFormData);
-      await dispatch(fetchUser({ token: token ?? "" }));
+      await dispatch(fetchUser(""));
 
       toast.success("User updated successfully");
     } catch (error) {
-      toast("Failed to update user.");
+      toast.error("Failed to update user.");
     }
   };
 
@@ -115,6 +114,7 @@ const UserProfilePage = () => {
 
     try {
       await updatePassword(user?.user_id ?? 0, passwordData);
+      setIsPasswordOpen(false);
       toast.success("Password updated successfully");
     } catch (error) {
       toast.error("Failed to update password.");
@@ -134,7 +134,7 @@ const UserProfilePage = () => {
 
     try {
       await updateAvatar(user?.user_id ?? 0, avatarData);
-      await dispatch(fetchUser({ token: token ?? "" }));
+      await dispatch(fetchUser(""));
       toast.success("Avatar updated successfully");
     } catch (error) {
       toast.error("Failed to update avatar.");
@@ -159,7 +159,6 @@ const UserProfilePage = () => {
         <title>User Profile</title>
       </Helmet>
       <div className={styles.wrapper}>
-        <h1>Hello there</h1>
         {user && (
           <div className={styles.userProfile}>
             {user.user_avatar && (
@@ -243,25 +242,14 @@ const UserProfilePage = () => {
             <Button text="Change password" type="submit" />
           </form>
         </Modal>
-        <Modal isOpen={isConfirmOpen} onClose={() => setIsConfirmOpen(false)}>
-          <h2 className={styles.header}>
-            Are you sure you want to delete this user? This action is
-            irreversible
-          </h2>
-          <div className={styles.btn__wrapper}>
-            <Button
-              onClick={handleDelete}
-              text="Yes, Delete"
-              type="button"
-              variant="danger"
-            />
-            <Button
-              onClick={() => setIsConfirmOpen(false)}
-              text="Cancel"
-              type="button"
-            />
-          </div>
-        </Modal>
+        <ConfirmModal
+          isOpen={isConfirmOpen}
+          onClose={() => setIsConfirmOpen(false)}
+          onConfirm={handleDelete}
+          text="Are you sure you want to delete this user? This action is
+            irreversible"
+          btnText="Yes, Delete"
+        />
         <form className={styles.form__wrapper} onSubmit={handleFileSubmit}>
           <input
             type="file"
