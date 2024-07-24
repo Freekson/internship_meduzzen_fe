@@ -1,0 +1,23 @@
+.pagination {
+  display: flex;
+  list-style-type: none;
+  margin-bottom: 3rem;
+}
+
+.pageItem {
+  margin: 0 5px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.pageItem.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.pageItem:hover {
+  background-color: #ddd;
+}

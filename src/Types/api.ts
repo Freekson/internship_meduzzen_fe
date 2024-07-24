@@ -21,3 +21,8 @@ interface LoginResult {
   access_token: string;
   token_type: string;
 }
+
+export interface ChangePasswordParams {
+  user_password: string;
+  user_password_repeat: string;
+}

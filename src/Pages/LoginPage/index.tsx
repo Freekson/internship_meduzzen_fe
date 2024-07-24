@@ -10,8 +10,11 @@ import { validateLoginFormData } from "../../Utils/formValidation";
 import { toast } from "react-toastify";
 import InputLabel from "../../Components/InputLabel";
 import Button from "../../Components/Button";
+import { setToken } from "../../Store/user/slice";
+import { useAppDispatch } from "../../Store/store";
 
 const LoginPage = () => {
+  const dispatch = useAppDispatch();
   const initialLoginFormData: LoginFormData = {
     email: "",
     password: "",
@@ -37,6 +40,7 @@ const LoginPage = () => {
       try {
         const response = await loginUser(formData);
         localStorage.setItem("BearerToken", response.result.access_token);
+        dispatch(setToken(response.result.access_token));
         navigate("/profile");
       } catch (error: any) {
         toast.error(`${error.response.data.detail}`);
