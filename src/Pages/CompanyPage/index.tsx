@@ -16,12 +16,19 @@ import {
   deleteCompany,
   getCompanyMembers,
   getCompanyQuizzes,
+  getCompanyQuizzes,
   updateCompany,
   updateVisibility,
 } from "../../Api/company";
 import { toast } from "react-toastify";
 import { CompanyQuizzesResponse, UserResponse } from "../../Types/api";
+import { CompanyQuizzesResponse, UserResponse } from "../../Types/api";
 import { addAdmin, deleteAdmin, leaveCompany } from "../../Api/actions";
+import {
+  QuizFormData,
+  quizFormFields,
+  updateCompanyFormFields,
+} from "./static";
 import {
   QuizFormData,
   quizFormFields,
@@ -47,6 +54,7 @@ const CompanyPage = () => {
   );
 
   const [currentQuiz, setCurrentQuiz] = useState(0);
+  const [currentQuiz, setCurrentQuiz] = useState(0);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
@@ -61,7 +69,19 @@ const CompanyPage = () => {
   const [admins, setAdmins] = useState<UserResponse[]>([]);
   const [quizzes, setQuizzes] = useState<CompanyQuizzesResponse[]>([]);
 
+  const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const [isDeleteQuizOpen, setIsDeleteQuizOpen] = useState(false);
+  const [isEditQuizOpen, setIsEditQuizOpen] = useState(false);
+
+  const [members, setMembers] = useState<UserResponse[]>([]);
+  const [admins, setAdmins] = useState<UserResponse[]>([]);
+  const [quizzes, setQuizzes] = useState<CompanyQuizzesResponse[]>([]);
+
   const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
+  const [selectedQuizzes, setSelectedQuizzes] =
+    useState<CompanyQuizzesResponse | null>(null);
+
+  const isAdminOrOwner = checkUserAction(members, user?.user_id ?? 0);
   const [selectedQuizzes, setSelectedQuizzes] =
     useState<CompanyQuizzesResponse | null>(null);
 
@@ -80,6 +100,22 @@ const CompanyPage = () => {
   const openDeleteAdminModal = (user: UserResponse) => {
     setSelectedUser(user);
     setIsDeleteAdminOpen(true);
+  };
+
+  const openDeleteQuizModal = (quiz: CompanyQuizzesResponse) => {
+    setSelectedQuizzes(quiz);
+    setIsDeleteQuizOpen(true);
+  };
+
+  const openEditQuizModal = (quiz: CompanyQuizzesResponse) => {
+    setSelectedQuizzes(quiz);
+    setQuizData({
+      quiz_name: quiz.quiz_name,
+      quiz_title: quiz.quiz_title,
+      quiz_description: quiz.quiz_description,
+      quiz_frequency: 0,
+    });
+    setIsEditQuizOpen(true);
   };
 
   const openDeleteQuizModal = (quiz: CompanyQuizzesResponse) => {
@@ -121,6 +157,13 @@ const CompanyPage = () => {
     quiz_frequency: 0,
   });
 
+  const [quizData, setQuizData] = useState<QuizFormData>({
+    quiz_name: "",
+    quiz_title: "",
+    quiz_description: "",
+    quiz_frequency: 0,
+  });
+
   useEffect(() => {
     if (token && id) {
       dispatch(
@@ -153,6 +196,7 @@ const CompanyPage = () => {
         toast.dismiss();
       }
     };
+
 
     fetchCompanyMembers();
     fetchCompanyQuizzes();
@@ -589,7 +633,41 @@ const CompanyPage = () => {
                   <p className={styles.quizName}>{item.quiz_name}</p>
                   <p className={styles.quizTitle}>
                     {item.quiz_title ? item.quiz_title : "No title"}
+              {quizzes.map((item, index) => (
+                <div key={index} className={styles.card}>
+                  <p className={styles.quizName}>{item.quiz_name}</p>
+                  <p className={styles.quizTitle}>
+                    {item.quiz_title ? item.quiz_title : "No title"}
                   </p>
+                  <p className={styles.quizDescription}>
+                    {item.quiz_description
+                      ? item.quiz_description
+                      : "No description"}
+                  </p>
+                  <CustomLink
+                    to={`/companies/${company.company_id}/quizzes/${item.quiz_id}`}
+                    text="Start Quiz"
+                    variant="primary"
+                  />
+                  {isAdminOrOwner && (
+                    <div className={styles.actions}>
+                      <Button
+                        text="Delete quiz"
+                        type="button"
+                        variant="danger"
+                        onClick={() => openDeleteQuizModal(item)}
+                      />
+                      <Button
+                        text="Edit quiz"
+                        type="button"
+                        variant="warning"
+                        onClick={() => {
+                          openEditQuizModal(item);
+                          setCurrentQuiz(item.quiz_id);
+                        }}
+                      />
+                    </div>
+                  )}
                   <p className={styles.quizDescription}>
                     {item.quiz_description
                       ? item.quiz_description
@@ -631,6 +709,7 @@ const CompanyPage = () => {
       <ConfirmModal
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
+        onConfirm={handleUserDelete}
         onConfirm={handleUserDelete}
         text="Are you sure you want to delete this company? This action is
             irreversible"
@@ -674,6 +753,57 @@ const CompanyPage = () => {
             text={`Are you sure you want to delete ${selectedUser.user_firstname} from admins? `}
             btnText="Yes, delete from admins"
           />
+        </>
+      )}
+      {selectedQuizzes && (
+        <>
+          <ConfirmModal
+            isOpen={isDeleteQuizOpen}
+            onClose={() => setIsDeleteQuizOpen(false)}
+            onConfirm={() => {
+              handleDeleteQuiz(selectedQuizzes.quiz_id);
+              setIsDeleteQuizOpen(false);
+            }}
+            text={`Are you sure you want to delete quest "${selectedQuizzes.quiz_name}"? `}
+            btnText="Yes, delete"
+          />
+          <Modal
+            isOpen={isEditQuizOpen}
+            onClose={() => setIsEditQuizOpen(false)}
+          >
+            <form className={styles.form__wrapper} onSubmit={handleEditQuiz}>
+              {quizFormFields.map((field) => (
+                <div className={styles.form__group} key={field.id}>
+                  <InputLabel
+                    label={field.label}
+                    id={field.id}
+                    name={field.name}
+                    type={field.type}
+                    value={
+                      quizData[field.name] !== null
+                        ? quizData[field.name].toString()
+                        : ""
+                    }
+                    onChange={handleQuizChange}
+                    required={field.required}
+                  />
+                </div>
+              ))}
+              <div className={styles.form__group}>
+                <InputLabel
+                  label="Quiz Frequency (days)"
+                  id="quiz_frequency"
+                  name="quiz_frequency"
+                  type="number"
+                  value={quizData.quiz_frequency}
+                  onChange={handleQuizChange}
+                  min={1}
+                  required
+                />
+              </div>
+              <Button type="submit" text="Submit" />
+            </form>
+          </Modal>
         </>
       )}
       {selectedQuizzes && (

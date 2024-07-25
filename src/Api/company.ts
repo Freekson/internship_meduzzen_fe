@@ -71,6 +71,10 @@ export const getCompanyQuizzes = (companyId: number) => {
   return api.get(`/company/${companyId}/quizzes_list/`);
 };
 
+export const getCompanyQuizzes = (companyId: number) => {
+  return api.get(`/company/${companyId}/quizzes_list/`);
+};
+
 export const fetchCompanyByIdFromApi = async (
   company_id: number
 ): Promise<CompanyDetails> => {
