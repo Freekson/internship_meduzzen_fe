@@ -32,7 +32,7 @@ const UserRequestPage = () => {
       try {
         setIsLoading(true);
         const res = await getUserRequests(user?.user_id ?? 0);
-        setCompanies(res.data.result.companies);
+        setCompanies(res);
         toast.dismiss();
         setIsLoading(false);
       } catch (error) {
@@ -86,37 +86,39 @@ const UserRequestPage = () => {
           <h1>List of Requests</h1>
           <div className={styles.companyList}>
             {companies.length > 0 ? (
-              companies.map((item) => (
-                <div key={item.company_id} className={styles.companyItem}>
-                  {item.company_avatar ? (
+              companies.map((company) => (
+                <div key={company.company_id} className={styles.companyItem}>
+                  {company.company_avatar ? (
                     <img
-                      src={item.company_avatar}
-                      alt={item.company_name}
+                      src={company.company_avatar}
+                      alt={company.company_name}
                       className={styles.companyAvatar}
                     />
                   ) : (
                     <div className={styles.avatarPlaceholder}>No Avatar</div>
                   )}
                   <div className={styles.companyDetails}>
-                    <h3 className={styles.companyName}>{item.company_name}</h3>
-                    {item.company_title && (
+                    <h3 className={styles.companyName}>
+                      {company.company_name}
+                    </h3>
+                    {company.company_title && (
                       <p className={styles.companyTitle}>
-                        Title: {item.company_title}
+                        Title: {company.company_title}
                       </p>
                     )}
                     <p
                       className={`${styles.companyVisibility} ${
-                        item.is_visible ? styles.visible : styles.hidden
+                        company.is_visible ? styles.visible : styles.hidden
                       }`}
                     >
-                      Visibility: {item.is_visible ? "Visible" : "Hidden"}
+                      Visibility: {company.is_visible ? "Visible" : "Hidden"}
                     </p>
                   </div>
                   <Button
                     type="button"
                     variant="danger"
                     text="Cancel"
-                    onClick={() => openConfirmModal(item)}
+                    onClick={() => openConfirmModal(company)}
                   />
                 </div>
               ))

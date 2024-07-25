@@ -24,6 +24,7 @@ import UserInvitationPage from "./Pages/UserInvitationPage";
 import UserRequestPage from "./Pages/UserRequestPage";
 import CompanyRequestPage from "./Pages/CompanyRequestPage";
 import CompanyInvitationPage from "./Pages/CompanyInvitationPage";
+import routes from "./routes";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -43,110 +44,108 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path="/" element={<StartPage />}></Route>
-        <Route path="/about" element={<AboutPage />}></Route>
+        <Route path={routes.start} element={<StartPage />} />
+        <Route path={routes.about} element={<AboutPage />} />
 
         {/* //! Unauthenticated routes */}
-
         <Route
-          path="/login"
+          path={routes.login}
           element={
             <UnauthenticatedRoute>
               <LoginPage />
             </UnauthenticatedRoute>
           }
-        ></Route>
+        />
         <Route
-          path="/register"
+          path={routes.register}
           element={
             <UnauthenticatedRoute>
               <RegisterPage />
             </UnauthenticatedRoute>
           }
-        ></Route>
+        />
 
         {/* //! Protected routes */}
-
         <Route
-          path="/company"
+          path={routes.companyProfile}
           element={
             <ProtectedRoute>
               <CompanyProfilePage />
             </ProtectedRoute>
           }
-        ></Route>
+        />
         <Route
-          path="/profile"
+          path={routes.userProfile}
           element={
             <ProtectedRoute>
               <UserProfilePage />
             </ProtectedRoute>
           }
-        ></Route>
+        />
         <Route
-          path="/users-list"
+          path={routes.usersList}
           element={
             <ProtectedRoute>
               <UsersListPage />
             </ProtectedRoute>
           }
-        ></Route>
+        />
         <Route
-          path="/companies"
+          path={routes.companiesList}
           element={
             <ProtectedRoute>
               <CompaniesListPage />
             </ProtectedRoute>
           }
-        ></Route>
+        />
         <Route
-          path="/user/invites"
+          path={routes.userInvites}
           element={
             <ProtectedRoute>
               <UserInvitationPage />
             </ProtectedRoute>
           }
-        ></Route>
+        />
         <Route
-          path="/user/requests"
+          path={routes.userRequests}
           element={
             <ProtectedRoute>
               <UserRequestPage />
             </ProtectedRoute>
           }
-        ></Route>
+        />
         <Route
-          path="/company/:id/requests"
+          path={routes.companyRequests(":id")}
           element={
             <ProtectedRoute>
               <CompanyRequestPage />
             </ProtectedRoute>
           }
-        ></Route>
+        />
         <Route
-          path="/company/:id/invites"
+          path={routes.companyInvites(":id")}
           element={
             <ProtectedRoute>
               <CompanyInvitationPage />
             </ProtectedRoute>
           }
-        ></Route>
+        />
         <Route
-          path="/user/:id"
+          path={routes.userPage(":id")}
           element={
             <ProtectedRoute>
               <UserPage />
             </ProtectedRoute>
           }
-        ></Route>
+        />
         <Route
-          path="/companies/:id"
+          path={routes.companyPage(":id")}
           element={
             <ProtectedRoute>
               <CompanyPage />
             </ProtectedRoute>
           }
-        ></Route>
+        />
       </Routes>
     </div>
   );

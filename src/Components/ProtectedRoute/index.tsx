@@ -6,6 +6,7 @@ import styles from "./ProtectedRoute.module.scss";
 import { RootState, useAppDispatch } from "../../Store/store";
 import { fetchUser } from "../../Store/user/slice";
 import { ReduxStatus } from "../../Types/enums";
+import routes from "../../routes";
 
 type TProps = {
   children: JSX.Element;
@@ -40,7 +41,7 @@ const ProtectedRoute: React.FC<TProps> = ({ children }) => {
   return token && status !== ReduxStatus.ERROR ? (
     children
   ) : (
-    <Navigate to="/login" />
+    <Navigate to={routes.login} />
   );
 };
 

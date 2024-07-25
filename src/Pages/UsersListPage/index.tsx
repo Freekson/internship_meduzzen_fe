@@ -19,6 +19,7 @@ import { sendInvite } from "../../Api/actions";
 import { ThreeDots } from "react-loader-spinner";
 import Notification from "../../Components/Notification";
 import CustomLink from "../../Components/CustomLink";
+import routes from "../../routes";
 
 const UsersListPage = () => {
   const dispatch = useAppDispatch();
@@ -136,7 +137,10 @@ const UsersListPage = () => {
 
                 <p className={styles.userEmail}>{item.user_email}</p>
                 <div className={styles.actions}>
-                  <CustomLink to={`/user/${item.user_id}`} text="Show user" />
+                  <CustomLink
+                    to={routes.userPage(item.user_id)}
+                    text="Show user"
+                  />{" "}
                   {item.user_id !== user?.user_id && companies.length > 0 && (
                     <Button
                       text="Invite user"

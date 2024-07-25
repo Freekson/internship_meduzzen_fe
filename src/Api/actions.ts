@@ -1,33 +1,51 @@
+import { ActionResponse } from "../Types/api";
 import api from "./api";
 
-export const acceptUserInvitation = (actionId: number) => {
-  return api.get(`/action/${actionId}/accept_invite/`);
+export const acceptUserInvitation = async (
+  actionId: number
+): Promise<ActionResponse> => {
+  return api.get(`/action/${actionId}/accept_invite/`).then((res) => res.data);
 };
 
-export const declineUserInvitation = (actionId: number) => {
+export const declineUserInvitation = (actionId: number): Promise<void> => {
   return api.get(`/action/${actionId}/decline_action/`);
 };
 
-export const leaveCompany = (actionId: number) => {
+export const leaveCompany = (actionId: number): Promise<void> => {
   return api.get(`/action/${actionId}/leave_company/`);
 };
 
-export const acceptRequest = (actionId: number) => {
-  return api.get(`/action/${actionId}/accept_request/`);
+export const acceptRequest = async (
+  actionId: number
+): Promise<ActionResponse> => {
+  return api.get(`/action/${actionId}/accept_request/`).then((res) => res.data);
 };
 
-export const requestJoin = (company_id: number) => {
-  return api.get(`/action/create_from_user/company/${company_id}/`);
+export const requestJoin = async (
+  company_id: number
+): Promise<ActionResponse> => {
+  return api
+    .get(`/action/create_from_user/company/${company_id}/`)
+    .then((res) => res.data);
 };
 
-export const sendInvite = (company_id: number, user_id: number) => {
-  return api.get(`/action/create_from_company/${company_id}/user/${user_id}/`);
+export const sendInvite = async (
+  company_id: number,
+  user_id: number
+): Promise<ActionResponse> => {
+  return api
+    .get(`/action/create_from_company/${company_id}/user/${user_id}/`)
+    .then((res) => res.data);
 };
 
-export const addAdmin = (actionId: number) => {
-  return api.get(`/action/${actionId}/add_to_admin/`);
+export const addAdmin = async (actionId: number): Promise<ActionResponse> => {
+  return api.get(`/action/${actionId}/add_to_admin/`).then((res) => res.data);
 };
 
-export const deleteAdmin = (actionId: number) => {
-  return api.get(`/action/${actionId}/remove_from_admin/`);
+export const deleteAdmin = async (
+  actionId: number
+): Promise<ActionResponse> => {
+  return api
+    .get(`/action/${actionId}/remove_from_admin/`)
+    .then((res) => res.data);
 };

@@ -20,6 +20,7 @@ import { handleLogout } from "../../Utils/handleLogout";
 import ConfirmModal from "../../Components/ConfirmModal";
 import { formChangeUserFields } from "./static";
 import CustomLink from "../../Components/CustomLink";
+import routes from "../../routes";
 
 const UserProfilePage = () => {
   const dispatch = useAppDispatch();
@@ -237,9 +238,9 @@ const UserProfilePage = () => {
         </form>
 
         <div className={styles.links}>
-          <CustomLink to="/users-list" text="See all users" />
-          <CustomLink to="/user/invites" text="See my invitations" />
-          <CustomLink to="/user/requests" text="See my requests" />
+          <CustomLink to={routes.usersList} text="See all users" />
+          <CustomLink to={routes.userInvites} text="See my invitations" />
+          <CustomLink to={routes.userRequests} text="See my requests" />
         </div>
 
         <Modal isOpen={isModalOpen} onClose={closeModal}>

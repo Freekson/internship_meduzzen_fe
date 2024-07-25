@@ -11,7 +11,7 @@ import {
 import { TCompany } from "../Types/types";
 import api, { apiWithoutAuth } from "./api";
 
-export const createUser = (formData: RegisterFormData) => {
+export const createUser = (formData: RegisterFormData): Promise<void> => {
   return apiWithoutAuth.post("/user", {
     user_email: formData.email,
     user_password: formData.password,
@@ -21,7 +21,9 @@ export const createUser = (formData: RegisterFormData) => {
   });
 };
 
-export const loginUser = (formData: LoginFormData): Promise<LoginResponse> => {
+export const loginUser = async (
+  formData: LoginFormData
+): Promise<LoginResponse> => {
   return apiWithoutAuth
     .post<LoginResponse>("/auth/login", {
       user_email: formData.email,
@@ -30,18 +32,24 @@ export const loginUser = (formData: LoginFormData): Promise<LoginResponse> => {
     .then((response) => response.data);
 };
 
-export const updateUser = (userId: number, userData: Partial<TUser>) => {
+export const updateUser = (
+  userId: number,
+  userData: Partial<TUser>
+): Promise<void> => {
   return api.put(`/user/${userId}/update_info/`, userData);
 };
 
 export const updatePassword = (
   userId: number,
   userData: ChangePasswordParams
-) => {
+): Promise<void> => {
   return api.put(`/user/${userId}/update_password/`, userData);
 };
 
-export const updateAvatar = (userId: number, avatarData: FormData) => {
+export const updateAvatar = (
+  userId: number,
+  avatarData: FormData
+): Promise<void> => {
   return api.put(`/user/${userId}/update_avatar/`, avatarData, {
     headers: {
       "Content-Type": "multipart/form-data",
@@ -49,16 +57,22 @@ export const updateAvatar = (userId: number, avatarData: FormData) => {
   });
 };
 
-export const deleteUser = (userId: number) => {
+export const deleteUser = (userId: number): Promise<void> => {
   return api.delete(`/user/${userId}/`);
 };
 
-export const getUserInvitation = (userId: number) => {
-  return api.get(`/user/${userId}/invites_list/`);
+export const getUserInvitation = async (
+  userId: number
+): Promise<TCompany[]> => {
+  return api
+    .get(`/user/${userId}/invites_list/`)
+    .then((res) => res.data.result.companies);
 };
 
-export const getUserRequests = (userId: number) => {
-  return api.get(`/user/${userId}/requests_list/`);
+export const getUserRequests = async (userId: number): Promise<TCompany[]> => {
+  return api
+    .get(`/user/${userId}/requests_list`)
+    .then((res) => res.data.result.companies);
 };
 
 export const fetchUserFromApi = async (): Promise<TUser> => {

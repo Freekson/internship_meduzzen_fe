@@ -12,6 +12,7 @@ import ConfirmModal from "../../Components/ConfirmModal";
 import { TCompany } from "../../Types/types";
 import { ThreeDots } from "react-loader-spinner";
 import CustomLink from "../../Components/CustomLink";
+import routes from "../../routes";
 
 const UserInvitationPage = () => {
   const { userData: user } = useSelector((state: RootState) => state.user);
@@ -31,7 +32,7 @@ const UserInvitationPage = () => {
       try {
         setIsLoading(true);
         const res = await getUserInvitation(user?.user_id ?? 0);
-        setCompanies(res.data.result.companies);
+        setCompanies(res);
         toast.dismiss();
         setIsLoading(false);
       } catch (error) {
@@ -101,18 +102,18 @@ const UserInvitationPage = () => {
           <h1>List of Invitations</h1>
           <div className={styles.companyList}>
             {companies.length > 0 ? (
-              companies.map((item) => (
-                <div key={item.company_id} className={styles.companyItem}>
-                  <p>{item.company_name}</p>
+              companies.map((company) => (
+                <div key={company.company_id} className={styles.companyItem}>
+                  <p>{company.company_name}</p>
                   <div className={styles.btns}>
                     <Button
                       type="button"
                       text="Accept"
                       onClick={() =>
                         handleAccept(
-                          item.company_id,
-                          item.company_name,
-                          item.action_id
+                          company.company_id,
+                          company.company_name,
+                          company.action_id
                         )
                       }
                     />
@@ -120,10 +121,10 @@ const UserInvitationPage = () => {
                       type="button"
                       text="Decline"
                       variant="danger"
-                      onClick={() => openConfirmModal(item)}
+                      onClick={() => openConfirmModal(company)}
                     />
                     <CustomLink
-                      to={`/companies/${item.company_id}`}
+                      to={routes.companyPage(company.company_id)}
                       text="Show"
                     />
                   </div>

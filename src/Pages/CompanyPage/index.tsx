@@ -24,6 +24,7 @@ import { addAdmin, deleteAdmin, leaveCompany } from "../../Api/actions";
 import { updateCompanyFormFields } from "./static";
 import CustomLink from "../../Components/CustomLink";
 import Notification from "../../Components/Notification";
+import routes from "../../routes";
 
 const CompanyPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -92,8 +93,8 @@ const CompanyPage = () => {
       if (!id) return;
 
       try {
-        const response = await getCompanyMembers(parseInt(id));
-        setMembers(response.data.result.users);
+        const res = await getCompanyMembers(parseInt(id));
+        setMembers(res);
       } catch (error: any) {
         toast.dismiss();
       }
@@ -192,8 +193,8 @@ const CompanyPage = () => {
       if (!id) return;
 
       try {
-        const response = await getCompanyMembers(parseInt(id));
-        setMembers(response.data.result.users);
+        const res = await getCompanyMembers(parseInt(id));
+        setMembers(res);
       } catch (error) {
         toast.error("Error while fetching company members");
       }
@@ -209,8 +210,8 @@ const CompanyPage = () => {
       if (!id) return;
 
       try {
-        const response = await getCompanyMembers(parseInt(id));
-        setMembers(response.data.result.users);
+        const res = await getCompanyMembers(parseInt(id));
+        setMembers(res);
       } catch (error) {
         toast.error("Error while fetching company members");
       }
@@ -226,8 +227,8 @@ const CompanyPage = () => {
       if (!id) return;
 
       try {
-        const response = await getCompanyMembers(parseInt(id));
-        setMembers(response.data.result.users);
+        const res = await getCompanyMembers(parseInt(id));
+        setMembers(res);
       } catch (error) {
         toast.error("Error while fetching company members");
       }
@@ -350,11 +351,11 @@ const CompanyPage = () => {
             {user?.user_id === company.company_owner.user_id && (
               <div className={styles.actions}>
                 <CustomLink
-                  to={`/company/${company.company_id}/requests`}
+                  to={routes.companyRequests(company.company_id)}
                   text="See company requests"
                 />
                 <CustomLink
-                  to={`/company/${company.company_id}/invites`}
+                  to={routes.companyInvites(company.company_id)}
                   text="See company invites"
                 />
               </div>
@@ -363,37 +364,42 @@ const CompanyPage = () => {
               <h1 className={styles.header}>Company members</h1>
             )}
             <div className={styles.usersList}>
-              {members.map((item, index) => (
+              {members.map((member, index) => (
                 <div key={index} className={styles.userCard}>
                   <p className={styles.userName}>
-                    {item.user_firstname !== "" ? item.user_firstname : "User"}
+                    {member.user_firstname !== ""
+                      ? member.user_firstname
+                      : "User"}
                   </p>
 
-                  <p className={styles.userEmail}>{item.user_email}</p>
-                  <CustomLink to={`/user/${item.user_id}`} text=" Show user" />
+                  <p className={styles.userEmail}>{member.user_email}</p>
+                  <CustomLink
+                    to={routes.userPage(member.user_id)}
+                    text="Show user"
+                  />
                   {user?.user_id === company.company_owner.user_id &&
-                    item.user_id !== company.company_owner.user_id && (
+                    member.user_id !== company.company_owner.user_id && (
                       <div className={styles.actions}>
                         <Button
                           text="Delete user"
                           type="button"
                           variant="danger"
-                          onClick={() => openConfirmModal(item)}
+                          onClick={() => openConfirmModal(member)}
                         />
-                        {item.action !== "admin" && (
+                        {member.action !== "admin" && (
                           <Button
                             text="Make admin"
                             type="button"
                             variant="warning"
-                            onClick={() => openAdminModal(item)}
+                            onClick={() => openAdminModal(member)}
                           />
                         )}
-                        {item.action === "admin" && (
+                        {member.action === "admin" && (
                           <Button
                             text="Delete admin"
                             type="button"
                             variant="danger"
-                            onClick={() => openDeleteAdminModal(item)}
+                            onClick={() => openDeleteAdminModal(member)}
                           />
                         )}
                       </div>
@@ -405,75 +411,45 @@ const CompanyPage = () => {
               <h1 className={styles.header}>Company admins</h1>
             )}
             <div className={styles.usersList}>
-              {admins.map((item, index) => (
+              {admins.map((admin, index) => (
                 <div key={index} className={styles.userCard}>
                   <p className={styles.userName}>
-                    {item.user_firstname !== "" ? item.user_firstname : "User"}
+                    {admin.user_firstname !== ""
+                      ? admin.user_firstname
+                      : "User"}
                   </p>
 
-                  <p className={styles.userEmail}>{item.user_email}</p>
-                  <CustomLink to={`/user/${item.user_id}`} text=" Show user" />
-                  {user?.user_id === company.company_owner.user_id &&
-                    item.user_id !== company.company_owner.user_id && (
-                      <div className={styles.actions}>
+                  <p className={styles.userEmail}>{admin.user_email}</p>
+                  <CustomLink
+                    to={routes.userPage(admin.user_id)}
+                    text="Show user"
+                  />
+                  {user?.user_id === company.company_owner.user_id && (
+                    <div className={styles.actions}>
+                      <Button
+                        text="Delete user"
+                        type="button"
+                        variant="danger"
+                        onClick={() => openConfirmModal(admin)}
+                      />
+                      {admin.action !== "admin" && (
                         <Button
-                          text="Delete user"
+                          text="Make admin"
+                          type="button"
+                          variant="warning"
+                          onClick={() => openAdminModal(admin)}
+                        />
+                      )}
+                      {admin.action === "admin" && (
+                        <Button
+                          text="Delete admin"
                           type="button"
                           variant="danger"
-                          onClick={() => openConfirmModal(item)}
+                          onClick={() => openDeleteAdminModal(admin)}
                         />
-                        {item.action !== "admin" && (
-                          <Button
-                            text="Make admin"
-                            type="button"
-                            variant="warning"
-                            onClick={() => openAdminModal(item)}
-                          />
-                        )}
-                        {item.action === "admin" && (
-                          <Button
-                            text="Delete admin"
-                            type="button"
-                            variant="danger"
-                            onClick={() => openDeleteAdminModal(item)}
-                          />
-                        )}
-                      </div>
-                    )}
-                </div>
-              ))}
-            </div>
-            {admins.length > 0 && (
-              <h1 className={styles.header}>Company admins</h1>
-            )}
-            <div className={styles.usersList}>
-              {admins.map((item, index) => (
-                <div key={index} className={styles.userCard}>
-                  <p className={styles.userName}>
-                    {item.user_firstname !== "" ? item.user_firstname : "User"}
-                  </p>
-
-                  <p className={styles.userEmail}>{item.user_email}</p>
-                  <CustomLink to={`/user/${item.user_id}`} text="Show user" />
-                  {user?.user_id === company.company_owner.user_id &&
-                    item.user_id !== company.company_owner.user_id && (
-                      <div className={styles.actions}>
-                        <Button
-                          text="Delete user"
-                          type="button"
-                          variant="danger"
-                          onClick={() => openConfirmModal(item)}
-                        />
-                        {item.action === "admin" && (
-                          <Button
-                            text="Delete admin"
-                            type="button"
-                            variant="danger"
-                            onClick={() => openDeleteAdminModal(item)}
-                          />
-                        )}
-                      </div>
-                    )}
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

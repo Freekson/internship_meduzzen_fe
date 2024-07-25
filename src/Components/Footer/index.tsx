@@ -1,21 +1,22 @@
 import { Link } from "react-router-dom";
 import styles from "./Footer.module.scss";
+import routes from "../../routes";
 const Footer: React.FC = () => {
   return (
     <footer className={styles.footer}>
       <nav className={styles.footer__nav}>
         <ul>
           <li>
-            <Link to="/">Home</Link>
+            <Link to={routes.start}>Home</Link>
           </li>
           <li>
-            <Link to="/about">About</Link>
+            <Link to={routes.about}>About</Link>
           </li>
           <li>
-            <Link to="/company">Company</Link>
+            <Link to={routes.companyProfile}>Company</Link>
           </li>
           <li>
-            <Link to="/profile">Profile</Link>
+            <Link to={routes.userProfile}>Profile</Link>
           </li>
         </ul>
       </nav>

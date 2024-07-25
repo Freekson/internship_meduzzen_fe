@@ -19,6 +19,7 @@ import CustomLink from "../../Components/CustomLink";
 import Notification from "../../Components/Notification";
 import { ReduxStatus } from "../../Types/enums";
 import { ThreeDots } from "react-loader-spinner";
+import routes from "../../routes";
 
 const CompanyProfilePage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -113,42 +114,45 @@ const CompanyProfilePage: React.FC = () => {
             visible={true}
           />
         ) : companies && companies.length > 0 ? (
-          companies.map((item) => (
-            <div key={item.company_id} className={styles.companyCard}>
-              {item.company_avatar ? (
+          companies.map((company) => (
+            <div key={company.company_id} className={styles.companyCard}>
+              {company.company_avatar ? (
                 <img
-                  src={item.company_avatar}
-                  alt={item.company_name}
+                  src={company.company_avatar}
+                  alt={company.company_name}
                   className={styles.companyAvatar}
                 />
               ) : (
                 <div className={styles.avatarPlaceholder}>No Avatar</div>
               )}
               <div className={styles.companyDetails}>
-                <h3 className={styles.companyName}>{item.company_name}</h3>
+                <h3 className={styles.companyName}>{company.company_name}</h3>
                 <p className={styles.companyId}>
-                  <b>ID:</b> {item.company_id}
+                  <b>ID:</b> {company.company_id}
                 </p>
-                {item.company_title && (
+                {company.company_title && (
                   <p className={styles.companyTitle}>
-                    <b>Title:</b> {item.company_title}
+                    <b>Title:</b> {company.company_title}
                   </p>
                 )}
                 <p className={styles.companyVisibility}>
-                  <b>Visibility:</b> {item.is_visible ? "Visible" : "Hidden"}
+                  <b>Visibility:</b> {company.is_visible ? "Visible" : "Hidden"}
                 </p>
                 <p className={styles.companyAction}>
-                  <b>Role:</b> {item.action}
+                  <b>Role:</b> {company.action}
                 </p>
               </div>
               <div className={styles.company_btns}>
-                <CustomLink to={`/companies/${item.company_id}`} text="Show" />
-                {item.action !== "owner" && (
+                <CustomLink
+                  to={routes.companyPage(company.company_id)}
+                  text="Show"
+                />
+                {company.action !== "owner" && (
                   <Button
                     text="Leave company"
                     type="button"
                     variant="danger"
-                    onClick={() => openConfirmModal(item)}
+                    onClick={() => openConfirmModal(company)}
                   />
                 )}
               </div>
@@ -159,7 +163,7 @@ const CompanyProfilePage: React.FC = () => {
         )}
         <div className={styles.btn_wrapper}>
           <Button text="Create company" type="button" onClick={openModal} />
-          <CustomLink to="/companies" text="See all companies" />
+          <CustomLink to={routes.companiesList} text="See all companies" />
         </div>
         <Modal isOpen={isModalOpen} onClose={closeModal}>
           <form className={styles.form} onSubmit={handleSubmit}>

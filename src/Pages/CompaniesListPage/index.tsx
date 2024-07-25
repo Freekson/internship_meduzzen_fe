@@ -18,6 +18,7 @@ import { ThreeDots } from "react-loader-spinner";
 import CustomLink from "../../Components/CustomLink";
 import { getUserRequests } from "../../Api/user";
 import { TCompany } from "../../Types/types";
+import routes from "../../routes";
 
 const CompaniesListPage = () => {
   const dispatch = useAppDispatch();
@@ -54,12 +55,12 @@ const CompaniesListPage = () => {
   const handleRequestJoin = async (company_id: number) => {
     try {
       const response = await requestJoin(company_id);
-      if (response.status === 200) {
+      if (response.status_code === 201) {
         toast.success("Request to join sent successfully");
 
         try {
           const res = await getUserRequests(user?.user_id ?? 0);
-          setInvites(res.data.result.companies);
+          setInvites(res);
         } catch (error) {
           toast.error("Error while getting invitations");
         }
@@ -98,7 +99,7 @@ const CompaniesListPage = () => {
     const fetchUserRequest = async () => {
       try {
         const res = await getUserRequests(user?.user_id ?? 0);
-        setInvites(res.data.result.companies);
+        setInvites(res);
         toast.dismiss();
       } catch (error) {
         toast.error("Error while getting invitations");
@@ -152,7 +153,7 @@ const CompaniesListPage = () => {
                     </h3>
                     <div className={styles.actions}>
                       <CustomLink
-                        to={`/companies/${company.company_id}`}
+                        to={routes.companyPage(company.company_id)}
                         text="Show"
                       />
                       {!userCompanies.some(
