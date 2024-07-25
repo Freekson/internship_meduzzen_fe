@@ -79,9 +79,9 @@ const QuizForm: React.FC<QuizFormProps> = ({
     setQuestions(newQuestions);
   };
 
-  const handleCorrectAnswerChange = (qIndex: number, value: string) => {
+  const handleCorrectAnswerChange = (qIndex: number, oIndex: number) => {
     const newQuestions = questions.slice();
-    newQuestions[qIndex].question_correct_answer = parseInt(value) - 1;
+    newQuestions[qIndex].question_correct_answer = oIndex;
     setQuestions(newQuestions);
   };
 
@@ -137,13 +137,20 @@ const QuizForm: React.FC<QuizFormProps> = ({
               text="&times;"
               type="button"
               variant="danger"
+              title="Delete question"
               onClick={() => handleRemoveQuestion(qIndex)}
               disabled={questions.length <= 2}
             />
           </div>
           {question.question_answers.map((option, oIndex) => (
             <div key={oIndex} className={styles.option}>
-              <div>
+              <div
+                className={
+                  oIndex === question.question_correct_answer
+                    ? styles.correctOption
+                    : ""
+                }
+              >
                 <InputLabel
                   label={`Option ${oIndex + 1}:`}
                   id={`option_${qIndex + 1}_${oIndex + 1}`}
@@ -157,9 +164,18 @@ const QuizForm: React.FC<QuizFormProps> = ({
                 />
               </div>
               <Button
+                text="✔"
+                type="button"
+                variant="success"
+                title="Set as correct"
+                onClick={() => handleCorrectAnswerChange(qIndex, oIndex)}
+                disabled={oIndex === question.question_correct_answer}
+              />
+              <Button
                 text="&times;"
                 type="button"
                 variant="warning"
+                title="Delete option"
                 onClick={() => handleRemoveOption(qIndex, oIndex)}
                 disabled={question.question_answers.length <= 2}
               />
@@ -172,17 +188,6 @@ const QuizForm: React.FC<QuizFormProps> = ({
               onClick={() => handleAddOption(qIndex)}
             />
           </div>
-          <InputLabel
-            label="Correct Answer Number:"
-            id="correct_number"
-            name="correct_number"
-            type="number"
-            value={String(question.question_correct_answer + 1)}
-            min={1}
-            max={question.question_answers.length}
-            onChange={(e) => handleCorrectAnswerChange(qIndex, e.target.value)}
-            required
-          />
         </div>
       ))}
       <div className={styles.main_actions}>
