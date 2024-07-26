@@ -116,3 +116,40 @@ export interface TakeQuizResponse {
 export interface IQuizData {
   [question_id: string]: string;
 }
+
+export type TUserRating = {
+  rating: number;
+  user_id: number;
+};
+
+export type UserGlobalAnalyticResponse = {
+  current_rating: number;
+  average_rating: number;
+  pass_at: string;
+};
+
+export interface Rating {
+  current_rating: number;
+  average_rating: number;
+  pass_at: string;
+}
+
+export interface UserQuizDataResponse {
+  rating: Rating[];
+  user_id: number;
+}
+
+export type UserLastPassResponse = {
+  quiz_id: number;
+  last_quiz_pass_at: string;
+};
+
+export type CompanyLastPassResponse = {
+  user_id: number;
+  quizzes: UserLastPassResponse[];
+};
+
+export type CompanyUserStatResponse = {
+  rating: Rating[];
+  quiz_id: number;
+};

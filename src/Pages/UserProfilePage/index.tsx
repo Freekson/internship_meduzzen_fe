@@ -4,12 +4,15 @@ import styles from "./UserProfilePage.module.scss";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Store/store";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Button from "../../Components/Button";
 import Modal from "../../Components/Modal";
 import InputLabel from "../../Components/InputLabel";
 import {
   deleteUser,
+  getUserGlobalAnalytic,
+  getUserGlobalRating,
+  getUserLastPass,
   updateAvatar,
   updatePassword,
   updateUser,
@@ -21,6 +24,12 @@ import ConfirmModal from "../../Components/ConfirmModal";
 import { formChangeUserFields } from "./static";
 import CustomLink from "../../Components/CustomLink";
 import routes from "../../routes";
+import StarsRating from "../../Components/StarsRating";
+import {
+  UserGlobalAnalyticResponse,
+  UserLastPassResponse,
+} from "../../Types/api";
+import UserGlobalAnalyticChart from "../../Components/UserGlobalAnalyticChart";
 
 const UserProfilePage = () => {
   const dispatch = useAppDispatch();
@@ -57,6 +66,52 @@ const UserProfilePage = () => {
   });
 
   const [file, setFile] = useState<File | null>(null);
+  const [rating, setRating] = useState(0);
+  const [isChartVisible, setIsChartVisible] = useState(false);
+  const [chartData, setChartData] = useState<UserGlobalAnalyticResponse[]>([]);
+  const [lastPassed, setLastPassed] = useState<UserLastPassResponse[]>([]);
+
+  useEffect(() => {
+    if (!user?.user_id) {
+      return;
+    }
+
+    const fetchUserGlobalRating = async () => {
+      try {
+        const res = await getUserGlobalRating(user?.user_id);
+        setRating(res);
+      } catch (error) {
+        toast.error("Error while fetching global rating");
+      }
+    };
+
+    const fetchUserGlobalAnalytic = async () => {
+      try {
+        const res = await getUserGlobalAnalytic(user?.user_id);
+        setChartData(res);
+      } catch (error) {
+        toast.error("Error while fetching user statistic");
+      }
+    };
+
+    const fetchUserLastQuizzes = async () => {
+      try {
+        const res = await getUserLastPass(user?.user_id);
+        setLastPassed(res);
+        setIsChartVisible(true);
+      } catch (error: any) {
+        if (error.response.data.detail === "User does not take any quiz") {
+          setIsChartVisible(false);
+        } else {
+          toast.error("Error while fetching user last quizzes");
+        }
+      }
+    };
+
+    fetchUserGlobalRating();
+    fetchUserGlobalAnalytic();
+    fetchUserLastQuizzes();
+  }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -175,6 +230,7 @@ const UserProfilePage = () => {
             <h1 className={styles.name}>
               {user.user_firstname} {user.user_lastname}
             </h1>
+            <StarsRating rating={rating} />
             {user.user_email && (
               <p className={styles.email}>
                 <b>Email:</b> {user.user_email}
@@ -242,6 +298,32 @@ const UserProfilePage = () => {
           <CustomLink to={routes.userInvites} text="See my invitations" />
           <CustomLink to={routes.userRequests} text="See my requests" />
         </div>
+
+        {isChartVisible && (
+          <>
+            <div className={styles.chart}>
+              <UserGlobalAnalyticChart data={chartData} />
+            </div>
+            {lastPassed.length > 0 && (
+              <h1 className={styles.lastQuizzes}>Last Passed Quizzes</h1>
+            )}
+            <div className={styles.userQuizzes}>
+              {lastPassed.map((quiz) => (
+                <div className={styles.quiz} key={quiz.quiz_id}>
+                  <h3>Quiz ID: {quiz.quiz_id}</h3>
+                  <p>
+                    Last Passed:{" "}
+                    {new Date(quiz.last_quiz_pass_at).toLocaleString()}
+                  </p>
+                  <CustomLink
+                    to={routes.quizPage(quiz.quiz_id)}
+                    text="Pass again"
+                  />
+                </div>
+              ))}
+            </div>
+          </>
+        )}
 
         <Modal isOpen={isModalOpen} onClose={closeModal}>
           <form className={styles.form__wrapper} onSubmit={handleSubmit}>

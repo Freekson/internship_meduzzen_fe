@@ -1,0 +1,107 @@
+.usersList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.card {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  width: 350px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  margin-bottom: 2rem;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  .userName,
+  .quizName,
+  .quizTitle {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .userEmail,
+  .quizDescription {
+    font-size: 14px;
+    color: #666;
+    max-width: 250px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.header {
+  font-size: 2rem;
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+.chart {
+  display: flex;
+  justify-content: center;
+  min-height: 500px;
+}
+
+.lastPasses {
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.lastPasses h4 {
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.lastPasses ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.lastPasses li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ddd;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.lastPasses li:last-child {
+  border-bottom: none;
+}
+
+.lastPasses p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #777;
+  font-style: italic;
+}
+
+.actions {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+}
