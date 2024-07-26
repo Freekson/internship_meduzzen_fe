@@ -8,6 +8,7 @@ import { fetchUserById } from "../../Store/user/slice";
 import { useSelector } from "react-redux";
 import { ReduxStatus } from "../../Types/enums";
 import { ThreeDots } from "react-loader-spinner";
+import Notification from "../../Components/Notification";
 
 const UserPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -78,7 +79,7 @@ const UserPage: React.FC = () => {
           )}
         </div>
       ) : (
-        <div className={styles.error}>User not found</div>
+        <Notification message="User not found" type="error" />
       )}
     </Layout>
   );

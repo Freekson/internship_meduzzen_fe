@@ -12,10 +12,14 @@ import InputLabel from "../../Components/InputLabel";
 import { validateCreateCompanyFormData } from "../../Utils/formValidation";
 import Modal from "../../Components/Modal";
 import { createCompany } from "../../Api/company";
-import { Link } from "react-router-dom";
 import { leaveCompany } from "../../Api/actions";
 import ConfirmModal from "../../Components/ConfirmModal";
 import { TCompany } from "../../Types/types";
+import CustomLink from "../../Components/CustomLink";
+import Notification from "../../Components/Notification";
+import { ReduxStatus } from "../../Types/enums";
+import { ThreeDots } from "react-loader-spinner";
+import routes from "../../routes";
 
 const CompanyProfilePage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -23,6 +27,7 @@ const CompanyProfilePage: React.FC = () => {
     userData: user,
     companies,
     token,
+    companiesStatus,
   } = useSelector((state: RootState) => state.user);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -98,57 +103,67 @@ const CompanyProfilePage: React.FC = () => {
 
       <div className={styles.wrapper}>
         <h1>Your companies</h1>
-        {companies && companies.length > 0 ? (
-          companies.map((item) => (
-            <div key={item.company_id} className={styles.companyCard}>
-              {item.company_avatar ? (
+        {companiesStatus === ReduxStatus.LOADING ? (
+          <ThreeDots
+            height="80"
+            width="80"
+            radius="9"
+            color="#fb791b"
+            ariaLabel="three-dots-loading"
+            wrapperStyle={{}}
+            visible={true}
+          />
+        ) : companies && companies.length > 0 ? (
+          companies.map((company) => (
+            <div key={company.company_id} className={styles.companyCard}>
+              {company.company_avatar ? (
                 <img
-                  src={item.company_avatar}
-                  alt={item.company_name}
+                  src={company.company_avatar}
+                  alt={company.company_name}
                   className={styles.companyAvatar}
                 />
               ) : (
                 <div className={styles.avatarPlaceholder}>No Avatar</div>
               )}
               <div className={styles.companyDetails}>
-                <h3 className={styles.companyName}>{item.company_name}</h3>
-                <p className={styles.companyId}>ID: {item.company_id}</p>
-                {item.company_title && (
+                <h3 className={styles.companyName}>{company.company_name}</h3>
+                <p className={styles.companyId}>
+                  <b>ID:</b> {company.company_id}
+                </p>
+                {company.company_title && (
                   <p className={styles.companyTitle}>
-                    Title: {item.company_title}
+                    <b>Title:</b> {company.company_title}
                   </p>
                 )}
                 <p className={styles.companyVisibility}>
-                  Visibility: {item.is_visible ? "Visible" : "Hidden"}
+                  <b>Visibility:</b> {company.is_visible ? "Visible" : "Hidden"}
                 </p>
-                <p className={styles.companyAction}>Action: {item.action}</p>
+                <p className={styles.companyAction}>
+                  <b>Role:</b> {company.action}
+                </p>
               </div>
               <div className={styles.company_btns}>
-                <Link
-                  to={`/companies/${item.company_id}`}
-                  className={styles.see_all}
-                >
-                  Show
-                </Link>
-                {item.action !== "owner" && (
+                <CustomLink
+                  to={routes.companyPage(company.company_id)}
+                  text="Show"
+                />
+                {company.action !== "owner" && (
                   <Button
                     text="Leave company"
                     type="button"
                     variant="danger"
-                    onClick={() => openConfirmModal(item)}
+                    onClick={() => openConfirmModal(company)}
                   />
                 )}
               </div>
             </div>
           ))
         ) : (
-          <p>You don't have companies</p>
+          <Notification message="You don't have companies" type="info" />
         )}
         <div className={styles.btn_wrapper}>
           <Button text="Create company" type="button" onClick={openModal} />
-          <Link to="/companies" className={styles.see_all}>
-            See all companies
-          </Link>
+          <CustomLink to={routes.companiesList} text="See all companies" />
         </div>
         <Modal isOpen={isModalOpen} onClose={closeModal}>
           <form className={styles.form} onSubmit={handleSubmit}>

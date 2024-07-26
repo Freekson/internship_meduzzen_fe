@@ -59,6 +59,9 @@ const companySlice = createSlice({
       state.companiesStatus = ReduxStatus.ERROR;
     });
 
+    builder.addCase(fetchCompanyById.pending, (state) => {
+      state.byIdStatus = ReduxStatus.LOADING;
+    });
     builder.addCase(fetchCompanyById.fulfilled, (state, action) => {
       const companyIndex = state.fetchedById.findIndex(
         (company) => company.company_id === action.payload.company_id

@@ -73,5 +73,13 @@ export interface UserResponse {
   user_lastname: string;
   user_avatar: string;
   action_id: number;
-  action: string;
+  action: "owner" | "member" | "admin";
 }
+
+export type ActionResponse = {
+  status_code: number;
+  detail: string;
+  result: {
+    action_id: number;
+  };
+};

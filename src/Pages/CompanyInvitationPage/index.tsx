@@ -29,7 +29,7 @@ const CompanyInvitationPage = () => {
     const fetchCompanyInvites = async () => {
       try {
         const res = await getCompanyInvitation(Number(companyId) ?? 0);
-        setUsers(res.data.result.users);
+        setUsers(res);
         toast.dismiss();
       } catch (error) {
         toast.error("Error while getting invitations");

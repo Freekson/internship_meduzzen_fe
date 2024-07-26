@@ -10,6 +10,7 @@ import { TCompany } from "../../Types/types";
 import Button from "../../Components/Button";
 import ConfirmModal from "../../Components/ConfirmModal";
 import { declineUserInvitation } from "../../Api/actions";
+import { ThreeDots } from "react-loader-spinner";
 
 const UserRequestPage = () => {
   const { userData: user, token } = useSelector(
@@ -19,6 +20,7 @@ const UserRequestPage = () => {
   const [companies, setCompanies] = useState<TCompany[]>([]);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState<TCompany | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const openConfirmModal = (company: TCompany) => {
     setSelectedCompany(company);
@@ -28,9 +30,11 @@ const UserRequestPage = () => {
   useEffect(() => {
     const fetchUserRequest = async () => {
       try {
+        setIsLoading(true);
         const res = await getUserRequests(user?.user_id ?? 0);
-        setCompanies(res.data.result.companies);
+        setCompanies(res);
         toast.dismiss();
+        setIsLoading(false);
       } catch (error) {
         toast.error("Error while getting invitations");
       }
@@ -65,65 +69,81 @@ const UserRequestPage = () => {
         <title>List of Requests</title>
       </Helmet>
 
-      <div className={styles.wrapper}>
-        <h1>List of Requests</h1>
-        <div className={styles.companyList}>
-          {companies.length > 0 ? (
-            companies.map((item) => (
-              <div key={item.company_id} className={styles.companyItem}>
-                {item.company_avatar ? (
-                  <img
-                    src={item.company_avatar}
-                    alt={item.company_name}
-                    className={styles.companyAvatar}
-                  />
-                ) : (
-                  <div className={styles.avatarPlaceholder}>No Avatar</div>
-                )}
-                <div className={styles.companyDetails}>
-                  <h3 className={styles.companyName}>{item.company_name}</h3>
-                  {item.company_title && (
-                    <p className={styles.companyTitle}>
-                      Title: {item.company_title}
-                    </p>
+      {isLoading ? (
+        <div className={styles.loading}>
+          <ThreeDots
+            height="80"
+            width="80"
+            radius="9"
+            color="#fb791b"
+            ariaLabel="three-dots-loading"
+            wrapperStyle={{}}
+            visible={true}
+          />
+        </div>
+      ) : (
+        <div className={styles.wrapper}>
+          <h1>List of Requests</h1>
+          <div className={styles.companyList}>
+            {companies.length > 0 ? (
+              companies.map((company) => (
+                <div key={company.company_id} className={styles.companyItem}>
+                  {company.company_avatar ? (
+                    <img
+                      src={company.company_avatar}
+                      alt={company.company_name}
+                      className={styles.companyAvatar}
+                    />
+                  ) : (
+                    <div className={styles.avatarPlaceholder}>No Avatar</div>
                   )}
-                  <p
-                    className={`${styles.companyVisibility} ${
-                      item.is_visible ? styles.visible : styles.hidden
-                    }`}
-                  >
-                    Visibility: {item.is_visible ? "Visible" : "Hidden"}
-                  </p>
+                  <div className={styles.companyDetails}>
+                    <h3 className={styles.companyName}>
+                      {company.company_name}
+                    </h3>
+                    {company.company_title && (
+                      <p className={styles.companyTitle}>
+                        Title: {company.company_title}
+                      </p>
+                    )}
+                    <p
+                      className={`${styles.companyVisibility} ${
+                        company.is_visible ? styles.visible : styles.hidden
+                      }`}
+                    >
+                      Visibility: {company.is_visible ? "Visible" : "Hidden"}
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="danger"
+                    text="Cancel"
+                    onClick={() => openConfirmModal(company)}
+                  />
                 </div>
-                <Button
-                  type="button"
-                  variant="danger"
-                  text="Cancel"
-                  onClick={() => openConfirmModal(item)}
-                />
-              </div>
-            ))
-          ) : (
-            <p className={styles.noCompanies}>You have no requests.</p>
+              ))
+            ) : (
+              <p className={styles.noCompanies}>You have no requests.</p>
+            )}
+          </div>
+          {selectedCompany && (
+            <ConfirmModal
+              isOpen={isConfirmOpen}
+              onClose={() => setIsConfirmOpen(false)}
+              onConfirm={() => {
+                handleCancel(
+                  selectedCompany.company_id,
+                  selectedCompany.company_name,
+                  selectedCompany.action_id
+                );
+                setIsConfirmOpen(false);
+              }}
+              text={`Are you sure you want to cancel request to ${selectedCompany.company_name}? `}
+              btnText="Yes, cancel it"
+            />
           )}
         </div>
-        {selectedCompany && (
-          <ConfirmModal
-            isOpen={isConfirmOpen}
-            onClose={() => setIsConfirmOpen(false)}
-            onConfirm={() => {
-              handleCancel(
-                selectedCompany.company_id,
-                selectedCompany.company_name,
-                selectedCompany.action_id
-              );
-              setIsConfirmOpen(false);
-            }}
-            text={`Are you sure you want to cancel request to ${selectedCompany.company_name}? `}
-            btnText="Yes, cancel it"
-          />
-        )}
-      </div>
+      )}
     </Layout>
   );
 };

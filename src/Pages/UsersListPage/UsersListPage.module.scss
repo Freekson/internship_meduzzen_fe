@@ -30,7 +30,7 @@
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 20px;
-    width: 200px;
+    width: 250px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
     margin-bottom: 2rem;
@@ -43,21 +43,23 @@
   .userName {
     font-size: 18px;
     font-weight: bold;
-    margin-bottom: 10px;
+    max-width: 150px;
+    padding: 5px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .userEmail {
     font-size: 14px;
     color: #666;
+    margin-top: 0;
     margin-bottom: 10px;
-  }
-
-  .userLink {
-    display: inline-block;
-    padding: 0.75rem 1.5rem;
-    background-color: #007b;
-    color: white;
-    border-radius: 4px;
+    max-width: 150px;
+    padding: 5px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
@@ -65,7 +67,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 1rem;
+  margin: 1rem 0;
 
   a {
     margin-bottom: 0.5rem;
@@ -81,4 +83,16 @@
   button {
     margin: 1rem 0;
   }
+}
+
+.loading {
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.notification {
+  margin: 4rem 0;
+  width: 100%;
 }

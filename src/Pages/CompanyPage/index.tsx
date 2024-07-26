@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import Layout from "../../Components/Layout";
 import styles from "./CompanyPage.module.scss";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { RootState, useAppDispatch } from "../../Store/store";
 import { useSelector } from "react-redux";
 import { FormEvent, useEffect, useState } from "react";
@@ -20,7 +20,11 @@ import {
 } from "../../Api/company";
 import { toast } from "react-toastify";
 import { UserResponse } from "../../Types/api";
-import { leaveCompany } from "../../Api/actions";
+import { addAdmin, deleteAdmin, leaveCompany } from "../../Api/actions";
+import { updateCompanyFormFields } from "./static";
+import CustomLink from "../../Components/CustomLink";
+import Notification from "../../Components/Notification";
+import routes from "../../routes";
 
 const CompanyPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -37,12 +41,25 @@ const CompanyPage = () => {
   const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [members, setMembers] = useState<UserResponse[]>([]);
+  const [admins, setAdmins] = useState<UserResponse[]>([]);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isDeleteAdminOpen, setIsDeleteAdminOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
 
   const openConfirmModal = (user: UserResponse) => {
     setSelectedUser(user);
     setIsDeleteOpen(true);
+  };
+
+  const openAdminModal = (user: UserResponse) => {
+    setSelectedUser(user);
+    setIsAdminOpen(true);
+  };
+
+  const openDeleteAdminModal = (user: UserResponse) => {
+    setSelectedUser(user);
+    setIsDeleteAdminOpen(true);
   };
 
   const company =
@@ -76,8 +93,8 @@ const CompanyPage = () => {
       if (!id) return;
 
       try {
-        const response = await getCompanyMembers(parseInt(id));
-        setMembers(response.data.result.users);
+        const res = await getCompanyMembers(parseInt(id));
+        setMembers(res);
       } catch (error: any) {
         toast.dismiss();
       }
@@ -97,6 +114,11 @@ const CompanyPage = () => {
       company_links: (company?.company_links || []).join(", "),
     });
   }, [company]);
+
+  useEffect(() => {
+    const adminUsers = members.filter((member) => member.action === "admin");
+    setAdmins(adminUsers);
+  }, [members]);
 
   const handleVisibilityChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -171,14 +193,48 @@ const CompanyPage = () => {
       if (!id) return;
 
       try {
-        const response = await getCompanyMembers(parseInt(id));
-        setMembers(response.data.result.users);
+        const res = await getCompanyMembers(parseInt(id));
+        setMembers(res);
       } catch (error) {
         toast.error("Error while fetching company members");
       }
       toast.success(`Member ${user_name} has been deleted`);
     } catch (error) {
       toast.error(`Failed to delete member: ${user_name}`);
+    }
+  };
+
+  const handleMakeAdmin = async (user_name: string, action_id: number) => {
+    try {
+      await addAdmin(action_id);
+      if (!id) return;
+
+      try {
+        const res = await getCompanyMembers(parseInt(id));
+        setMembers(res);
+      } catch (error) {
+        toast.error("Error while fetching company members");
+      }
+      toast.success(`Member ${user_name} has been promoted to admin`);
+    } catch (error) {
+      toast.error(`Failed to promote member: ${user_name}`);
+    }
+  };
+
+  const handleDeleteAdmin = async (user_name: string, action_id: number) => {
+    try {
+      await deleteAdmin(action_id);
+      if (!id) return;
+
+      try {
+        const res = await getCompanyMembers(parseInt(id));
+        setMembers(res);
+      } catch (error) {
+        toast.error("Error while fetching company members");
+      }
+      toast.success(`Member ${user_name} has been deleted from admins`);
+    } catch (error) {
+      toast.error(`Failed to delete admin: ${user_name}`);
     }
   };
 
@@ -218,14 +274,24 @@ const CompanyPage = () => {
             {company.company_title && (
               <h2 className={styles.title}>{company.company_title}</h2>
             )}
-            <p>Visibility: {company.is_visible ? "Visible" : "Hidden"}</p>
+            <p>
+              <b>Visibility:</b> {company.is_visible ? "Visible" : "Hidden"}
+            </p>
             <p className={styles.description}>{company.company_description}</p>
-            <p className={styles.city}>City: {company.company_city}</p>
-            <p className={styles.phone}>Phone: {company.company_phone}</p>
+            {company.company_city && (
+              <p className={styles.city}>
+                <b>City:</b> {company.company_city}
+              </p>
+            )}
+            {company.company_phone && (
+              <p className={styles.phone}>
+                <b>Phone</b>: {company.company_phone}
+              </p>
+            )}
 
             {company.company_links && company.company_links.length > 0 ? (
               <div className={styles.links}>
-                <h3>Links:</h3>
+                <b>Links:</b>
                 <ul>
                   {company.company_links.map((link, index) => (
                     <li key={index}>
@@ -237,10 +303,10 @@ const CompanyPage = () => {
                 </ul>
               </div>
             ) : (
-              <p className={styles.noLinks}>No Links Available</p>
+              <b className={styles.noLinks}>No Links Available</b>
             )}
             <div className={styles.owner}>
-              <h3>Owner:</h3>
+              <h1>Owner:</h1>
               <div className={styles.ownerInfo}>
                 {company.company_owner.user_avatar ? (
                   <img
@@ -249,13 +315,13 @@ const CompanyPage = () => {
                     className={styles.ownerAvatar}
                   />
                 ) : (
-                  <div className={styles.noImage}>No Image</div>
+                  <div className={styles.noOwnerImage}>No Image</div>
                 )}
                 <div className={styles.ownerDetails}>
-                  <p>
+                  <b>
                     {company.company_owner.user_firstname}{" "}
                     {company.company_owner.user_lastname}
-                  </p>
+                  </b>
                   <p>{company.company_owner.user_email}</p>
                 </div>
               </div>
@@ -284,55 +350,113 @@ const CompanyPage = () => {
             )}
             {user?.user_id === company.company_owner.user_id && (
               <div className={styles.actions}>
-                <Link
-                  to={`/company/${company.company_id}/requests`}
-                  className={styles.showLink}
-                >
-                  See company requests
-                </Link>
-                <Link
-                  to={`/company/${company.company_id}/invites`}
-                  className={styles.showLink}
-                >
-                  See company invites
-                </Link>
+                <CustomLink
+                  to={routes.companyRequests(company.company_id)}
+                  text="See company requests"
+                />
+                <CustomLink
+                  to={routes.companyInvites(company.company_id)}
+                  text="See company invites"
+                />
               </div>
             )}
             {members.length > 0 && (
               <h1 className={styles.header}>Company members</h1>
             )}
             <div className={styles.usersList}>
-              {members.map((item, index) => (
+              {members.map((member, index) => (
                 <div key={index} className={styles.userCard}>
                   <p className={styles.userName}>
-                    {item.user_firstname !== "" ? item.user_firstname : "User"}
+                    {member.user_firstname !== ""
+                      ? member.user_firstname
+                      : "User"}
                   </p>
 
-                  <p className={styles.userEmail}>{item.user_email}</p>
-                  <Link
-                    to={`/user/${item.user_id}`}
-                    className={styles.userLink}
-                  >
-                    Show user
-                  </Link>
+                  <p className={styles.userEmail}>{member.user_email}</p>
+                  <CustomLink
+                    to={routes.userPage(member.user_id)}
+                    text="Show user"
+                  />
                   {user?.user_id === company.company_owner.user_id &&
-                    item.user_id !== company.company_owner.user_id && (
+                    member.user_id !== company.company_owner.user_id && (
                       <div className={styles.actions}>
                         <Button
                           text="Delete user"
                           type="button"
                           variant="danger"
-                          onClick={() => openConfirmModal(item)}
+                          onClick={() => openConfirmModal(member)}
                         />
+                        {member.action !== "admin" && (
+                          <Button
+                            text="Make admin"
+                            type="button"
+                            variant="warning"
+                            onClick={() => openAdminModal(member)}
+                          />
+                        )}
+                        {member.action === "admin" && (
+                          <Button
+                            text="Delete admin"
+                            type="button"
+                            variant="danger"
+                            onClick={() => openDeleteAdminModal(member)}
+                          />
+                        )}
                       </div>
                     )}
+                </div>
+              ))}
+            </div>
+            {admins.length > 0 && (
+              <h1 className={styles.header}>Company admins</h1>
+            )}
+            <div className={styles.usersList}>
+              {admins.map((admin, index) => (
+                <div key={index} className={styles.userCard}>
+                  <p className={styles.userName}>
+                    {admin.user_firstname !== ""
+                      ? admin.user_firstname
+                      : "User"}
+                  </p>
+
+                  <p className={styles.userEmail}>{admin.user_email}</p>
+                  <CustomLink
+                    to={routes.userPage(admin.user_id)}
+                    text="Show user"
+                  />
+                  {user?.user_id === company.company_owner.user_id && (
+                    <div className={styles.actions}>
+                      <Button
+                        text="Delete user"
+                        type="button"
+                        variant="danger"
+                        onClick={() => openConfirmModal(admin)}
+                      />
+                      {admin.action !== "admin" && (
+                        <Button
+                          text="Make admin"
+                          type="button"
+                          variant="warning"
+                          onClick={() => openAdminModal(admin)}
+                        />
+                      )}
+                      {admin.action === "admin" && (
+                        <Button
+                          text="Delete admin"
+                          type="button"
+                          variant="danger"
+                          onClick={() => openDeleteAdminModal(admin)}
+                        />
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
         </div>
       ) : (
-        <div className={styles.error}>Company not found</div>
+        <Notification message="Company not found" type="error" />
       )}
 
       <ConfirmModal
@@ -344,16 +468,44 @@ const CompanyPage = () => {
         btnText="Yes, Delete"
       />
       {selectedUser && (
-        <ConfirmModal
-          isOpen={isDeleteOpen}
-          onClose={() => setIsDeleteOpen(false)}
-          onConfirm={() => {
-            handleLeave(selectedUser.user_firstname, selectedUser.action_id);
-            setIsDeleteOpen(false);
-          }}
-          text={`Are you sure you want to delete ${selectedUser.user_firstname} from you company? `}
-          btnText="Yes, delete"
-        />
+        <>
+          <ConfirmModal
+            isOpen={isDeleteOpen}
+            onClose={() => setIsDeleteOpen(false)}
+            onConfirm={() => {
+              handleLeave(selectedUser.user_firstname, selectedUser.action_id);
+              setIsDeleteOpen(false);
+            }}
+            text={`Are you sure you want to delete ${selectedUser.user_firstname} from you company? `}
+            btnText="Yes, delete"
+          />
+          <ConfirmModal
+            isOpen={isAdminOpen}
+            onClose={() => setIsAdminOpen(false)}
+            onConfirm={() => {
+              handleMakeAdmin(
+                selectedUser.user_firstname,
+                selectedUser.action_id
+              );
+              setIsAdminOpen(false);
+            }}
+            text={`Are you sure you want to make ${selectedUser.user_firstname} admin in you company? `}
+            btnText="Yes, promote"
+          />
+          <ConfirmModal
+            isOpen={isDeleteAdminOpen}
+            onClose={() => setIsDeleteAdminOpen(false)}
+            onConfirm={() => {
+              handleDeleteAdmin(
+                selectedUser.user_firstname,
+                selectedUser.action_id
+              );
+              setIsDeleteAdminOpen(false);
+            }}
+            text={`Are you sure you want to delete ${selectedUser.user_firstname} from admins? `}
+            btnText="Yes, delete from admins"
+          />
+        </>
       )}
       <Modal
         isOpen={isVisibilityOpen}
@@ -378,55 +530,19 @@ const CompanyPage = () => {
       </Modal>
       <Modal isOpen={isInfoOpen} onClose={() => setIsInfoOpen(false)}>
         <form className={styles.form__wrapper} onSubmit={handleInfoSubmit}>
-          <InputLabel
-            label="Company name"
-            type="text"
-            id="company_name"
-            name="company_name"
-            value={formData.company_name}
-            onChange={handleInfoChange}
-            required
-          />
-          <InputLabel
-            label="Company title"
-            type="text"
-            id="company_title"
-            name="company_title"
-            value={formData.company_title}
-            onChange={handleInfoChange}
-          />
-          <InputLabel
-            label="Company description"
-            type="text"
-            id="company_description"
-            name="company_description"
-            value={formData.company_description}
-            onChange={handleInfoChange}
-          />
-          <InputLabel
-            label="Company city"
-            type="text"
-            id="company_city"
-            name="company_city"
-            value={formData.company_city}
-            onChange={handleInfoChange}
-          />
-          <InputLabel
-            label="Company phone"
-            type="text"
-            id="company_phone"
-            name="company_phone"
-            value={formData.company_phone}
-            onChange={handleInfoChange}
-          />
-          <InputLabel
-            label="Company Links (comma separated)"
-            type="text"
-            id="company_links"
-            name="company_links"
-            value={formData.company_links}
-            onChange={handleInfoChange}
-          />
+          {updateCompanyFormFields.map((field) => (
+            <div className={styles.form__group} key={field.id}>
+              <InputLabel
+                label={field.label}
+                id={field.id}
+                name={field.name}
+                type={field.type}
+                value={formData[field.name]}
+                onChange={handleInfoChange}
+                required={field.required}
+              />
+            </div>
+          ))}
           <Button type="submit" text="Change" />
         </form>
       </Modal>

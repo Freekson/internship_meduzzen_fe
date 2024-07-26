@@ -65,3 +65,9 @@
 .userName {
   margin-right: 1rem;
 }
+
+.actions {
+  a:not(:last-child) {
+    margin-right: 1rem;
+  }
+}
