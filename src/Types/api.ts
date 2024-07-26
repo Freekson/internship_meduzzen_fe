@@ -83,3 +83,17 @@ export type ActionResponse = {
     action_id: number;
   };
 };
+
+export interface CompanyQuizzesResponse {
+  quiz_id: number;
+  quiz_name: string;
+  quiz_title: string;
+  quiz_description: string;
+}
+
+export interface CompanyQuizzesResponse {
+  quiz_id: number;
+  quiz_name: string;
+  quiz_title: string;
+  quiz_description: string;
+}

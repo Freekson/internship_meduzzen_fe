@@ -1,6 +1,7 @@
 import { CompaniesResult, CompanyDetails } from "../Store/company/types";
 import {
   CompaniesAllResponse,
+  CompanyQuizzesResponse,
   CompanyResponse,
   CreateCompanyFormData,
   UserResponse,
@@ -65,6 +66,14 @@ export const getCompanyMembers = async (
   return api
     .get(`/company/${companyId}/members_list/`)
     .then((res) => res.data.result.users);
+};
+
+export const getCompanyQuizzes = async (
+  companyId: number
+): Promise<CompanyQuizzesResponse[]> => {
+  return api
+    .get(`/company/${companyId}/quizzes_list/`)
+    .then((res) => res.data.result.quizzes);
 };
 
 export const fetchCompanyByIdFromApi = async (

@@ -15,15 +15,24 @@ import InputLabel from "../../Components/InputLabel";
 import {
   deleteCompany,
   getCompanyMembers,
+  getCompanyQuizzes,
   updateCompany,
   updateVisibility,
 } from "../../Api/company";
 import { toast } from "react-toastify";
-import { UserResponse } from "../../Types/api";
+import { CompanyQuizzesResponse, UserResponse } from "../../Types/api";
 import { addAdmin, deleteAdmin, leaveCompany } from "../../Api/actions";
-import { updateCompanyFormFields } from "./static";
+import {
+  QuizFormData,
+  quizFormFields,
+  updateCompanyFormFields,
+} from "./static";
 import CustomLink from "../../Components/CustomLink";
 import Notification from "../../Components/Notification";
+import QuizForm from "../../Components/QuizForm";
+import { createQuiz, deleteQuiz, updateQuiz } from "../../Api/quizzes";
+import { IQuiz } from "../../Types/types";
+import { checkUserAction } from "../../Utils/checkUserAction";
 import routes from "../../routes";
 
 const CompanyPage = () => {
@@ -37,15 +46,26 @@ const CompanyPage = () => {
     (state: RootState) => state.user
   );
 
+  const [currentQuiz, setCurrentQuiz] = useState(0);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
-  const [members, setMembers] = useState<UserResponse[]>([]);
-  const [admins, setAdmins] = useState<UserResponse[]>([]);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isDeleteAdminOpen, setIsDeleteAdminOpen] = useState(false);
+
+  const [members, setMembers] = useState<UserResponse[]>([]);
+  const [admins, setAdmins] = useState<UserResponse[]>([]);
+  const [quizzes, setQuizzes] = useState<CompanyQuizzesResponse[]>([]);
+
+  const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const [isDeleteQuizOpen, setIsDeleteQuizOpen] = useState(false);
+  const [isEditQuizOpen, setIsEditQuizOpen] = useState(false);
+
   const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
+  const [selectedQuizzes, setSelectedQuizzes] =
+    useState<CompanyQuizzesResponse | null>(null);
+  const isAdminOrOwner = checkUserAction(members, user?.user_id ?? 0);
 
   const openConfirmModal = (user: UserResponse) => {
     setSelectedUser(user);
@@ -62,6 +82,22 @@ const CompanyPage = () => {
     setIsDeleteAdminOpen(true);
   };
 
+  const openDeleteQuizModal = (quiz: CompanyQuizzesResponse) => {
+    setSelectedQuizzes(quiz);
+    setIsDeleteQuizOpen(true);
+  };
+
+  const openEditQuizModal = (quiz: CompanyQuizzesResponse) => {
+    setSelectedQuizzes(quiz);
+    setQuizData({
+      quiz_name: quiz.quiz_name,
+      quiz_title: quiz.quiz_title,
+      quiz_description: quiz.quiz_description,
+      quiz_frequency: 0,
+    });
+    setIsEditQuizOpen(true);
+  };
+
   const company =
     fetchedById.find((company) => company.company_id === Number(id)) || null;
 
@@ -76,6 +112,13 @@ const CompanyPage = () => {
     company_city: company?.company_city || "",
     company_phone: company?.company_phone || "",
     company_links: initialCompanyLinksString,
+  });
+
+  const [quizData, setQuizData] = useState<QuizFormData>({
+    quiz_name: "",
+    quiz_title: "",
+    quiz_description: "",
+    quiz_frequency: 0,
   });
 
   useEffect(() => {
@@ -100,7 +143,19 @@ const CompanyPage = () => {
       }
     };
 
+    const fetchCompanyQuizzes = async () => {
+      if (!id) return;
+
+      try {
+        const res = await getCompanyQuizzes(parseInt(id));
+        setQuizzes(res);
+      } catch (error: any) {
+        toast.dismiss();
+      }
+    };
+
     fetchCompanyMembers();
+    fetchCompanyQuizzes();
   }, [id, token]);
 
   useEffect(() => {
@@ -134,7 +189,15 @@ const CompanyPage = () => {
     }));
   };
 
-  const handleDelete = async () => {
+  const handleQuizChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setQuizData((prevData) => ({
+      ...prevData,
+      [name]: name === "quiz_frequency" ? Number(value) : value,
+    }));
+  };
+
+  const handleUserDelete = async () => {
     try {
       await deleteCompany(company?.company_id ?? 0);
       toast.success("Company deleted successfully");
@@ -238,6 +301,63 @@ const CompanyPage = () => {
     }
   };
 
+  const handleSubmitQuiz = async (quiz: IQuiz) => {
+    try {
+      const response = await createQuiz(quiz);
+      toast.success(`Quiz Created Successfully: ${response}`);
+      setIsQuizOpen(false);
+
+      if (!id) return;
+
+      try {
+        const res = await getCompanyQuizzes(parseInt(id));
+        setQuizzes(res);
+      } catch (error: any) {
+        toast.dismiss();
+      }
+    } catch (error) {
+      toast.error("Error Creating Quiz");
+    }
+  };
+
+  const handleDeleteQuiz = async (quiz_id: number) => {
+    try {
+      await deleteQuiz(quiz_id);
+      if (!id) return;
+
+      try {
+        const res = await getCompanyQuizzes(parseInt(id));
+        setQuizzes(res);
+      } catch (error) {
+        toast.error("Error while fetching quizzes");
+      }
+      toast.success(`Quiz ${quiz_id} has been deleted`);
+    } catch (error) {
+      toast.error(`Failed to delete quiz: ${quiz_id}`);
+    }
+  };
+
+  const handleEditQuiz = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsEditQuizOpen(false);
+
+    try {
+      await updateQuiz(currentQuiz, quizData);
+      setIsEditQuizOpen(false);
+
+      if (!id) return;
+      try {
+        const res = await getCompanyQuizzes(parseInt(id));
+        setQuizzes(res);
+      } catch (error: any) {
+        toast.dismiss();
+      }
+      toast.success("Quiz updated successfully");
+    } catch (error) {
+      toast.error("Failed to update quiz.");
+    }
+  };
+
   return (
     <Layout>
       <Helmet>
@@ -327,36 +447,46 @@ const CompanyPage = () => {
               </div>
             </div>
             {user?.user_id === company.company_owner.user_id && (
-              <div className={styles.actions}>
-                <Button
-                  text="Edit info"
-                  type="button"
-                  variant="warning"
-                  onClick={() => setIsInfoOpen(true)}
-                />
-                <Button
-                  text="Edit visibility"
-                  type="button"
-                  variant="warning"
-                  onClick={() => setIsVisibilityOpen(true)}
-                />
-                <Button
-                  text="Delete"
-                  type="button"
-                  variant="danger"
-                  onClick={() => setIsConfirmOpen(true)}
-                />
-              </div>
+              <>
+                <div className={styles.actions}>
+                  <Button
+                    text="Edit info"
+                    type="button"
+                    variant="warning"
+                    onClick={() => setIsInfoOpen(true)}
+                  />
+                  <Button
+                    text="Edit visibility"
+                    type="button"
+                    variant="warning"
+                    onClick={() => setIsVisibilityOpen(true)}
+                  />
+                  <Button
+                    text="Delete"
+                    type="button"
+                    variant="danger"
+                    onClick={() => setIsConfirmOpen(true)}
+                  />
+                </div>
+                <div className={styles.actions}>
+                  <CustomLink
+                    to={routes.companyRequests(company.company_id)}
+                    text="See company requests"
+                  />
+                  <CustomLink
+                    to={routes.companyInvites(company.company_id)}
+                    text="See company invites"
+                  />
+                </div>
+              </>
             )}
-            {user?.user_id === company.company_owner.user_id && (
+            {isAdminOrOwner && (
               <div className={styles.actions}>
-                <CustomLink
-                  to={routes.companyRequests(company.company_id)}
-                  text="See company requests"
-                />
-                <CustomLink
-                  to={routes.companyInvites(company.company_id)}
-                  text="See company invites"
+                <Button
+                  text="Create Quiz"
+                  type="button"
+                  variant="success"
+                  onClick={() => setIsQuizOpen(true)}
                 />
               </div>
             )}
@@ -365,7 +495,7 @@ const CompanyPage = () => {
             )}
             <div className={styles.usersList}>
               {members.map((member, index) => (
-                <div key={index} className={styles.userCard}>
+                <div key={index} className={styles.card}>
                   <p className={styles.userName}>
                     {member.user_firstname !== ""
                       ? member.user_firstname
@@ -412,17 +542,16 @@ const CompanyPage = () => {
             )}
             <div className={styles.usersList}>
               {admins.map((admin, index) => (
-                <div key={index} className={styles.userCard}>
+                <div key={index} className={styles.card}>
                   <p className={styles.userName}>
                     {admin.user_firstname !== ""
                       ? admin.user_firstname
                       : "User"}
                   </p>
-
                   <p className={styles.userEmail}>{admin.user_email}</p>
                   <CustomLink
                     to={routes.userPage(admin.user_id)}
-                    text="Show user"
+                    text=" Show user"
                   />
                   {user?.user_id === company.company_owner.user_id && (
                     <div className={styles.actions}>
@@ -453,6 +582,46 @@ const CompanyPage = () => {
                 </div>
               ))}
             </div>
+            {quizzes.length > 0 && <h1 className={styles.header}>Quizzes</h1>}
+            <div className={styles.usersList}>
+              {quizzes.map((item, index) => (
+                <div key={index} className={styles.card}>
+                  <p className={styles.quizName}>{item.quiz_name}</p>
+                  <p className={styles.quizTitle}>
+                    {item.quiz_title ? item.quiz_title : "No title"}
+                  </p>
+                  <p className={styles.quizDescription}>
+                    {item.quiz_description
+                      ? item.quiz_description
+                      : "No description"}
+                  </p>
+                  <CustomLink
+                    to={routes.quizPage(item.quiz_id)}
+                    text="Start Quiz"
+                    variant="primary"
+                  />
+                  {isAdminOrOwner && (
+                    <div className={styles.actions}>
+                      <Button
+                        text="Delete quiz"
+                        type="button"
+                        variant="danger"
+                        onClick={() => openDeleteQuizModal(item)}
+                      />
+                      <Button
+                        text="Edit quiz"
+                        type="button"
+                        variant="warning"
+                        onClick={() => {
+                          openEditQuizModal(item);
+                          setCurrentQuiz(item.quiz_id);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       ) : (
@@ -462,7 +631,7 @@ const CompanyPage = () => {
       <ConfirmModal
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
-        onConfirm={handleDelete}
+        onConfirm={handleUserDelete}
         text="Are you sure you want to delete this company? This action is
             irreversible"
         btnText="Yes, Delete"
@@ -507,6 +676,57 @@ const CompanyPage = () => {
           />
         </>
       )}
+      {selectedQuizzes && (
+        <>
+          <ConfirmModal
+            isOpen={isDeleteQuizOpen}
+            onClose={() => setIsDeleteQuizOpen(false)}
+            onConfirm={() => {
+              handleDeleteQuiz(selectedQuizzes.quiz_id);
+              setIsDeleteQuizOpen(false);
+            }}
+            text={`Are you sure you want to delete quest "${selectedQuizzes.quiz_name}"? `}
+            btnText="Yes, delete"
+          />
+          <Modal
+            isOpen={isEditQuizOpen}
+            onClose={() => setIsEditQuizOpen(false)}
+          >
+            <form className={styles.form__wrapper} onSubmit={handleEditQuiz}>
+              {quizFormFields.map((field) => (
+                <div className={styles.form__group} key={field.id}>
+                  <InputLabel
+                    label={field.label}
+                    id={field.id}
+                    name={field.name}
+                    type={field.type}
+                    value={
+                      quizData[field.name] !== null
+                        ? quizData[field.name].toString()
+                        : ""
+                    }
+                    onChange={handleQuizChange}
+                    required={field.required}
+                  />
+                </div>
+              ))}
+              <div className={styles.form__group}>
+                <InputLabel
+                  label="Quiz Frequency (days)"
+                  id="quiz_frequency"
+                  name="quiz_frequency"
+                  type="number"
+                  value={quizData.quiz_frequency}
+                  onChange={handleQuizChange}
+                  min={1}
+                  required
+                />
+              </div>
+              <Button type="submit" text="Submit" />
+            </form>
+          </Modal>
+        </>
+      )}
       <Modal
         isOpen={isVisibilityOpen}
         onClose={() => setIsVisibilityOpen(false)}
@@ -545,6 +765,13 @@ const CompanyPage = () => {
           ))}
           <Button type="submit" text="Change" />
         </form>
+      </Modal>
+      <Modal isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)}>
+        <QuizForm
+          onSubmit={handleSubmitQuiz}
+          onClose={() => setIsQuizOpen(false)}
+          company_id={company?.company_id ?? 0}
+        />
       </Modal>
     </Layout>
   );
