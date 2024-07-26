@@ -1,6 +1,6 @@
 import { CompaniesResult, CompanyDetails } from "../Store/company/types";
 import { TUser, UsersResult } from "../Store/user/types";
-import { TCompany } from "./types";
+import { IFullQuiz, TCompany } from "./types";
 
 export interface RegisterFormData {
   email: string;
@@ -96,4 +96,23 @@ export interface CompanyQuizzesResponse {
   quiz_name: string;
   quiz_title: string;
   quiz_description: string;
+}
+
+export interface QuizResponse {
+  status_code: number;
+  detail: string;
+  result: IFullQuiz;
+}
+
+export interface TakeQuizResponse {
+  status_code: number;
+  detail: string;
+  result: {
+    result_id: number;
+    result_score: number;
+  };
+}
+
+export interface IQuizData {
+  [question_id: string]: string;
 }

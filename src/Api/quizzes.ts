@@ -1,5 +1,6 @@
 import { QuizFormData } from "../Pages/CompanyPage/static";
-import { IQuiz } from "../Types/types";
+import { IQuizData, QuizResponse, TakeQuizResponse } from "../Types/api";
+import { IFullQuiz, IQuiz } from "../Types/types";
 import api from "./api";
 
 export const createQuiz = (quizData: IQuiz): Promise<number> => {
@@ -22,4 +23,24 @@ export const updateQuiz = (
   companyData: QuizFormData
 ): Promise<void> => {
   return api.put(`/quiz/${quiz_id}/update_info/`, companyData);
+};
+
+export const getQuiz = async (quiz_id: number): Promise<IFullQuiz> => {
+  return api
+    .get<QuizResponse>(`/quiz/${quiz_id}/`)
+    .then((res) => res.data.result);
+};
+
+export const takeQuiz = async (
+  quiz_id: number,
+  quizData: IQuizData
+): Promise<{
+  result_id: number;
+  result_score: number;
+}> => {
+  return api
+    .post<TakeQuizResponse>(`/quiz/${quiz_id}/take_quiz/`, {
+      answers: quizData,
+    })
+    .then((res) => res.data.result);
 };

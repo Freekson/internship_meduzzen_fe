@@ -25,6 +25,7 @@ import UserRequestPage from "./Pages/UserRequestPage";
 import CompanyRequestPage from "./Pages/CompanyRequestPage";
 import CompanyInvitationPage from "./Pages/CompanyInvitationPage";
 import routes from "./routes";
+import QuizPage from "./Pages/QuizPage";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -143,6 +144,14 @@ function App() {
           element={
             <ProtectedRoute>
               <CompanyPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={routes.quizPage(":id")}
+          element={
+            <ProtectedRoute>
+              <QuizPage />
             </ProtectedRoute>
           }
         />
