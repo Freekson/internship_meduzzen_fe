@@ -153,3 +153,13 @@ export type CompanyUserStatResponse = {
   rating: Rating[];
   quiz_id: number;
 };
+
+export type NotificationResponse = {
+  notification_id: number;
+  notification_title: string;
+  notification_message: string;
+  notification_user_id: number;
+  notification_company_id: number;
+  is_read: boolean;
+  created_at: string;
+};
