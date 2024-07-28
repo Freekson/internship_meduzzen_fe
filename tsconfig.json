@@ -16,5 +16,5 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "setupTests.js", "jest.config.js"]
+  "include": ["src"]
 }
