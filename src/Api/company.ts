@@ -1,9 +1,12 @@
 import { CompaniesResult, CompanyDetails } from "../Store/company/types";
 import {
   CompaniesAllResponse,
+  CompanyLastPassResponse,
   CompanyQuizzesResponse,
   CompanyResponse,
+  CompanyUserStatResponse,
   CreateCompanyFormData,
+  UserQuizDataResponse,
   UserResponse,
 } from "../Types/api";
 import api from "./api";
@@ -74,6 +77,31 @@ export const getCompanyQuizzes = async (
   return api
     .get(`/company/${companyId}/quizzes_list/`)
     .then((res) => res.data.result.quizzes);
+};
+
+export const getUsersRating = async (
+  companyId: number
+): Promise<UserQuizDataResponse[]> => {
+  return api
+    .get(`/company/${companyId}/summary_rating_analytic_for_users/`)
+    .then((res) => res.data.result.rating);
+};
+
+export const getUsersLastPass = async (
+  companyId: number
+): Promise<CompanyLastPassResponse[]> => {
+  return api
+    .get(`/company/${companyId}/quizzes_last_pass/`)
+    .then((res) => res.data.result.users);
+};
+
+export const getCompanyUserStats = async (
+  companyId: number,
+  userId: number
+): Promise<CompanyUserStatResponse[]> => {
+  return api
+    .get(`/company/${companyId}/summary_rating_analytic_for_user/${userId}`)
+    .then((res) => res.data.result.rating);
 };
 
 export const fetchCompanyByIdFromApi = async (

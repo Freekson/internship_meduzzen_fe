@@ -482,6 +482,14 @@ const CompanyPage = () => {
             )}
             {isAdminOrOwner && (
               <div className={styles.actions}>
+                <CustomLink
+                  to={routes.companyStatisticsPage(company.company_id)}
+                  text="See company statistics"
+                />
+              </div>
+            )}
+            {isAdminOrOwner && (
+              <div className={styles.actions}>
                 <Button
                   text="Create Quiz"
                   type="button"

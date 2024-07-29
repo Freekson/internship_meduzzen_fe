@@ -14,6 +14,7 @@ const routes = {
   userPage: (id: string | number) => `/user/${id}`,
   companyPage: (id: string | number) => `/companies/${id}`,
   quizPage: (id: string | number) => `/quiz/${id}`,
+  companyStatisticsPage: (id: string | number) => `/company/${id}/statistics`,
 };
 
 export default routes;

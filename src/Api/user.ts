@@ -6,6 +6,8 @@ import {
   LoginResponse,
   RegisterFormData,
   UserFullResponse,
+  UserGlobalAnalyticResponse,
+  UserLastPassResponse,
   UsersListResponse,
 } from "../Types/api";
 import { TCompany } from "../Types/types";
@@ -73,6 +75,28 @@ export const getUserRequests = async (userId: number): Promise<TCompany[]> => {
   return api
     .get(`/user/${userId}/requests_list`)
     .then((res) => res.data.result.companies);
+};
+
+export const getUserGlobalRating = async (userId: number): Promise<number> => {
+  return api
+    .get(`/user/${userId}/global_rating/`)
+    .then((res) => res.data.result.rating);
+};
+
+export const getUserGlobalAnalytic = async (
+  userId: number
+): Promise<UserGlobalAnalyticResponse[]> => {
+  return api
+    .get(`/user/${userId}/global_rating_analytic/`)
+    .then((res) => res.data.result.rating);
+};
+
+export const getUserLastPass = async (
+  userId: number
+): Promise<UserLastPassResponse[]> => {
+  return api
+    .get(`/user/${userId}/quizzes_last_pass/`)
+    .then((res) => res.data.result.quizzes);
 };
 
 export const fetchUserFromApi = async (): Promise<TUser> => {
