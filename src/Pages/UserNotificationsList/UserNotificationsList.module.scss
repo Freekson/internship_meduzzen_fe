@@ -1,0 +1,45 @@
+.notifications {
+  padding: 20px;
+  margin-bottom: 4rem;
+
+  h1 {
+    margin-bottom: 20px;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  li {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 20px;
+    display: flex;
+    margin-bottom: 1rem;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+
+    &.unread {
+      background-color: #f9f9f9;
+    }
+
+    &.read {
+      background-color: #e0e0e0; // lighter background for read notifications
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    p {
+      margin: 5px 0;
+      color: #555;
+    }
+  }
+
+  button {
+    margin-top: 20px;
+  }
+}

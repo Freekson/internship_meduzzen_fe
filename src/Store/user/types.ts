@@ -1,3 +1,4 @@
+import { NotificationResponse } from "../../Types/api";
 import { ReduxStatus } from "../../Types/enums";
 import { TCompany, TPagination } from "../../Types/types";
 
@@ -7,10 +8,13 @@ export interface userState {
   usersList: UsersResult | null;
   fetchedById: TUser[];
   companies: TCompany[];
+  notifications: NotificationResponse[];
+  unreadNotifications: NotificationResponse[];
   status: ReduxStatus;
   listStatus: ReduxStatus;
   fetchedByIdStatus: ReduxStatus;
   companiesStatus: ReduxStatus;
+  notificationsStatus: ReduxStatus;
 }
 
 export type TUser = {

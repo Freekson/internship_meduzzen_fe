@@ -8,12 +8,24 @@ import Button from "../Button";
 import { handleLogout } from "../../Utils/handleLogout";
 import CustomLink from "../CustomLink";
 import routes from "../../routes";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBell } from "@fortawesome/free-solid-svg-icons";
+import { useEffect } from "react";
+import { fetchUserNotifications } from "../../Store/user/slice";
 const Header: React.FC = () => {
-  const { status, userData } = useSelector((state: RootState) => state.user);
+  const { status, userData, unreadNotifications } = useSelector(
+    (state: RootState) => state.user
+  );
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const { user, isAuthenticated, logout } = useAuth0();
+
+  useEffect(() => {
+    if (userData && status === ReduxStatus.SUCCESS) {
+      dispatch(fetchUserNotifications({ user_id: userData.user_id ?? 0 }));
+    }
+  }, [dispatch, status, userData]);
 
   return (
     <header className={styles.header}>
@@ -49,6 +61,22 @@ const Header: React.FC = () => {
           </>
         ) : status === ReduxStatus.SUCCESS && userData ? (
           <>
+            <div className={styles.notificationButton}>
+              <CustomLink
+                text={
+                  <>
+                    <FontAwesomeIcon icon={faBell} />{" "}
+                    {unreadNotifications.length > 0 && (
+                      <span className={styles.notificationCount}>
+                        {unreadNotifications.length}
+                      </span>
+                    )}
+                  </>
+                }
+                to={routes.userNotifications}
+                variant="primary"
+              />
+            </div>
             <p className={styles.userName}>{userData.user_firstname}</p>
             <Button
               type="button"

@@ -4,6 +4,7 @@ import {
   CompaniesResponse,
   LoginFormData,
   LoginResponse,
+  NotificationResponse,
   RegisterFormData,
   UserFullResponse,
   UserGlobalAnalyticResponse,
@@ -97,6 +98,23 @@ export const getUserLastPass = async (
   return api
     .get(`/user/${userId}/quizzes_last_pass/`)
     .then((res) => res.data.result.quizzes);
+};
+
+export const getUserNotifications = async (
+  userId: number
+): Promise<NotificationResponse[]> => {
+  return api
+    .get(`/user/${userId}/notifications_list/`)
+    .then((res) => res.data.result.notifications);
+};
+
+export const readNotification = async (
+  userId: number,
+  notificationId: number
+): Promise<void> => {
+  return api.get(
+    `/user/${userId}/mark_notification_as_read/${notificationId}/`
+  );
 };
 
 export const fetchUserFromApi = async (): Promise<TUser> => {

@@ -9,6 +9,7 @@ const routes = {
   companiesList: "/companies",
   userInvites: "/user/invites",
   userRequests: "/user/requests",
+  userNotifications: "/user/notifications",
   companyRequests: (id: string | number) => `/company/${id}/requests`,
   companyInvites: (id: string | number) => `/company/${id}/invites`,
   userPage: (id: string | number) => `/user/${id}`,

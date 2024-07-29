@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { ReduxStatus } from "../../Types/enums";
 import { TUser, UsersResult, userState } from "./types";
@@ -8,7 +8,9 @@ import {
   fetchUserByIdFromApi,
   fetchUserFromApi,
   fetchUsersListFromApi,
+  getUserNotifications,
 } from "../../Api/user";
+import { NotificationResponse } from "../../Types/api";
 
 const tokenLS = localStorage.getItem("BearerToken");
 
@@ -18,10 +20,13 @@ const initialState: userState = {
   usersList: null,
   fetchedById: [],
   companies: [],
+  notifications: [],
+  unreadNotifications: [],
   status: ReduxStatus.INIT,
   listStatus: ReduxStatus.INIT,
   fetchedByIdStatus: ReduxStatus.INIT,
   companiesStatus: ReduxStatus.INIT,
+  notificationsStatus: ReduxStatus.INIT,
 };
 
 export const fetchUser = createAsyncThunk<TUser, string>(
@@ -56,6 +61,14 @@ export const fetchCompanies = createAsyncThunk<TCompany[], { user_id: number }>(
   }
 );
 
+export const fetchUserNotifications = createAsyncThunk<
+  NotificationResponse[],
+  { user_id: number }
+>("user/fetchUserNotifications", async ({ user_id }) => {
+  const data = await getUserNotifications(user_id);
+  return data;
+});
+
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -80,6 +93,18 @@ const userSlice = createSlice({
       state.status = initialState.status;
       state.listStatus = initialState.listStatus;
       state.fetchedByIdStatus = initialState.fetchedByIdStatus;
+    },
+    markAsRead: (state, action: PayloadAction<{ notification_id: number }>) => {
+      const { notification_id } = action.payload;
+      const notification = state.notifications.find(
+        (n) => n.notification_id === notification_id
+      );
+      if (notification) {
+        notification.is_read = true;
+        state.unreadNotifications = state.unreadNotifications.filter(
+          (n) => n.notification_id !== notification_id
+        );
+      }
     },
   },
   extraReducers: (builder) => {
@@ -138,8 +163,25 @@ const userSlice = createSlice({
       state.companies = [];
       state.companiesStatus = ReduxStatus.ERROR;
     });
+
+    builder.addCase(fetchUserNotifications.pending, (state) => {
+      state.notifications = [];
+      state.notificationsStatus = ReduxStatus.LOADING;
+    });
+    builder.addCase(fetchUserNotifications.fulfilled, (state, action) => {
+      state.notifications = action.payload;
+      state.unreadNotifications = action.payload.filter(
+        (item) => item.is_read === false
+      );
+      state.notificationsStatus = ReduxStatus.SUCCESS;
+    });
+    builder.addCase(fetchUserNotifications.rejected, (state) => {
+      state.notifications = [];
+      state.notificationsStatus = ReduxStatus.ERROR;
+    });
   },
 });
 
-export const { setActivePage, resetState, setToken } = userSlice.actions;
+export const { setActivePage, resetState, setToken, markAsRead } =
+  userSlice.actions;
 export default userSlice.reducer;

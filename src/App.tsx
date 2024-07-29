@@ -27,6 +27,7 @@ import CompanyInvitationPage from "./Pages/CompanyInvitationPage";
 import routes from "./routes";
 import QuizPage from "./Pages/QuizPage";
 import CompanyStatisticsPage from "./Pages/CompanyStatisticsPage";
+import UserNotificationsList from "./Pages/UserNotificationsList";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -113,6 +114,14 @@ function App() {
           element={
             <ProtectedRoute>
               <UserRequestPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={routes.userNotifications}
+          element={
+            <ProtectedRoute>
+              <UserNotificationsList />
             </ProtectedRoute>
           }
         />
